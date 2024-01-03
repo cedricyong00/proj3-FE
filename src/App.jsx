@@ -1,10 +1,17 @@
+/* eslint-disable no-unused-vars */
 import { useState } from 'react'
 import './App.css'
+
+// Import styles of packages that you've installed.
+// All packages except `@mantine/hooks` require styles imports
+import '@mantine/core/styles.css';
+
+import { MantineProvider } from '@mantine/core';
 
 function App() {
   const [count, setCount] = useState(0)
 
-  return (
+  return <MantineProvider>(
     <>
       <h1>Vite + React</h1>
       <div className="card">
@@ -20,6 +27,7 @@ function App() {
       </p>
     </>
   )
+  </MantineProvider>
 }
 
 export default App
