@@ -24,15 +24,15 @@ function SignInPage() {
     </Title>
     <Text c="dimmed" size="sm" ta="center" mt={5}>
       Do not have an account yet?{" "}
-      <Anchor size="sm" to="/signup">
+      <Anchor size="sm" href="/signup">
         Create account
       </Anchor>
     </Text>
     <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-      <TextInput label="Email" placeholder="you@mantine.dev" required />
+      <TextInput label="Email" placeholder="Enter Your Email" required />
       <PasswordInput
         label="Password"
-        placeholder="Your password"
+        placeholder="Enter Your Password"
         required
         mt="md"
       />
