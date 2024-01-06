@@ -12,6 +12,12 @@ import {
 
 function SignInPage() {
     return (
+    <>
+    {/* Redirects to signup page */}
+    <a href="/signup">SIGN UP</a>
+    <br />
+    <a href="/owner/bookings">OWNER DASHBOARD</a>
+
     <Container size={420} my={40}>
     <Title ta="center" className={classes.title}>
       Welcome back!
@@ -35,6 +41,7 @@ function SignInPage() {
       </Button>
     </Paper>
   </Container>
+  </>
     )
 }
 
