@@ -1,19 +1,36 @@
+/* eslint-disable no-const-assign */
+/* eslint-disable no-unused-vars */
 import { Route, Routes } from "react-router-dom";
 
 // User Model
-import SignInPage from "./User_Main_Page/Signin";
-import SignUpPage from "./User_Main_Page/Signup";
-import Account from "./User_Main_Page/Account";
-import EditAccount from "./User_Main_Page/EditAccount";
-import BookingList from "./User_Main_Page/BookingList";
+import SignInPage from "./User/Signin";
+import SignUpPage from "./User/Signup";
+import Account from "./User/Account";
+import EditAccount from "./User/EditAccount";
+import BookingList from "./User/BookingList";
 
-// Restaurant Model
+// Owner Model
 import OwnerDashboard from "./Owner/OwnerDashboard";
 import RestaurantInfo from "./Owner/RestaurantInfo";
 import NewRestaurant from "./Owner/NewRestaurant";
 import UpdateRestaurant from "./Owner/UpdateRestaurant";
 
+// Restaurant Model
+import NewBooking from "./Restaurant/NewBooking";
+import UpdateBooking from "./Restaurant/UpdateBooking";
+import BookingDetails from "./Restaurant/BookingDetails";
+
+import { useState } from "react";
+
 function App() {
+
+  let [database, setdatabase] = useState([]);
+
+  // Dummy Data
+  setdatabase = [
+    { id: 123, message: "Hello"}
+  ];
+
   return (
     <Routes>
       {/* User Model */}
@@ -30,7 +47,9 @@ function App() {
       <Route path="/owner/restaurant/edit" element={<UpdateRestaurant />} />
 
       {/* Restaurant Model */}
-
+      <Route path="/restaurant/id/new-booking" element={<NewBooking />} />
+      <Route path="/booking/id/edit" element={<UpdateBooking />} />
+      <Route path="/booking/id/details" element={<BookingDetails />} />
     </Routes>
   );
 }
