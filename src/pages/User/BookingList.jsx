@@ -1,91 +1,116 @@
-import { Table, ScrollArea, Group, Text, Button } from "@mantine/core";
+import {
+  Table,
+  ScrollArea,
+  Group,
+  Text,
+  Button,
+  Modal,
+  Anchor,
+} from "@mantine/core";
 import PropTypes from "prop-types";
-import classes from "./BookingList.module.css";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { Link } from "react-router-dom";
+import { bookings } from "../../assets/sampleData/booking";
 
 function Th({ children }) {
   return (
-    <Table.Th className={classes.th}>
-      <Group justify="space-between">
-        <Text fw={500} fz="sm">
-          {children}
-        </Text>
-      </Group>
+    <Table.Th>
+      <Text fw={700} fz="sm">
+        {children}
+      </Text>
     </Table.Th>
   );
 }
 
-const data = [
-  {
-    id: 1,
-    date: "04/01/2023",
-    time: "18:00",
-    restaurant: "Ikea",
-    request: "I want to sit near the window",
-  },
-  {
-    id: 2,
-    date: "04/01/2023",
-    time: "18:00",
-    restaurant: "Ikea",
-    request: "I want to sit near the window",
-  },
-  {
-    id: 3,
-    date: "04/01/2023",
-    time: "18:00",
-    restaurant: "Ikea",
-    request: "I want to sit near the window",
-  },
-];
-
 function BookingList() {
+  const [opened, { toggle, close }] = useDisclosure(false);
+  const data = bookings;
+
+  const handleSubmit = () => {
+    close();
+    notifications.show({
+      title: "Table canceled!",
+      message: "You will receive a confirmation email shortly",
+      autoClose: 5000,
+    });
+  };
+
   const rows = data.map((row) => (
     <Table.Tr key={row.id}>
-      <Table.Td>{row.restaurant}</Table.Td>
+      <Table.Td>
+        <Anchor component={Link} to="/restaurant/1">
+          {row.restaurant}
+        </Anchor>
+      </Table.Td>
       <Table.Td>{row.date}</Table.Td>
       <Table.Td>{row.time}</Table.Td>
       <Table.Td>{row.request}</Table.Td>
 
-      <Table.Td>
-        <Button variant="outline">Cancel</Button>
+      <Table.Td w="85px">
+        <Button variant="outline" onClick={toggle}>
+          Cancel
+        </Button>
       </Table.Td>
-      <Table.Td>
-        <Button>Edit</Button>
+      <Table.Td w="85px">
+        <Button component={Link} to="/booking/1/edit">
+          Edit
+        </Button>
       </Table.Td>
     </Table.Tr>
   ));
 
   return (
-    <ScrollArea>
-      <Table
-        horizontalSpacing="md"
-        verticalSpacing="xs"
-        miw={700}
-        layout="fixed"
-      >
-        <Table.Tbody>
-          <Table.Tr>
-            <Th>Restaurant</Th>
-            <Th>Date</Th>
-            <Th>Time</Th>
-            <Th>Request</Th>
-          </Table.Tr>
-        </Table.Tbody>
-        <Table.Tbody>
-          {rows.length > 0 ? (
-            rows
-          ) : (
+    <>
+      <ScrollArea>
+        <Table
+          verticalSpacing="xs"
+          miw={700}
+        >
+          <Table.Tbody>
             <Table.Tr>
-              <Table.Td colSpan={Object.keys(data[0]).length}>
-                <Text fw={500} ta="center">
-                  Nothing found
-                </Text>
-              </Table.Td>
+              <Th>Restaurant</Th>
+              <Th>Date</Th>
+              <Th>Time</Th>
+              <Th>Request</Th>
             </Table.Tr>
-          )}
-        </Table.Tbody>
-      </Table>
-    </ScrollArea>
+          </Table.Tbody>
+          <Table.Tbody>
+            {rows.length > 0 ? (
+              rows
+            ) : (
+              <Table.Tr>
+                <Table.Td colSpan={Object.keys(data[0]).length}>
+                  <Text fw={500} ta="center">
+                    Nothing found
+                  </Text>
+                </Table.Td>
+              </Table.Tr>
+            )}
+          </Table.Tbody>
+        </Table>
+      </ScrollArea>
+
+      {/* Modal */}
+      <Modal opened={opened} onClose={close} title="Cancel a table reservation">
+        <ul>
+          <li>Date: 04/01/2024</li>
+          <li>Time: 18:00</li>
+          <li>Table for: 3</li>
+          <li>Special Request: None</li>
+        </ul>
+
+        <Text mt="md">Are you sure you want to proceed?</Text>
+        <Group justify="center" mt="xl">
+          <Button type="button" variant="outline" onClick={toggle}>
+            Back
+          </Button>
+          <Button type="submit" onClick={handleSubmit}>
+            Proceed
+          </Button>
+        </Group>
+      </Modal>
+    </>
   );
 }
 

@@ -5,6 +5,7 @@ import {
   Group,
   Modal,
   NumberInput,
+  Text,
   Textarea,
   Title,
   rem,
@@ -85,7 +86,6 @@ function NewBooking() {
         <form
           onSubmit={form.onSubmit((values) => {
             console.log(values);
-            // toggle();
             if (form.isValid) {
               toggle();
             }
@@ -127,16 +127,13 @@ function NewBooking() {
           <Group justify="center" mt="xl">
             <Button
               type="button"
-              mt="md"
               component={Link}
               to={`/restaurant/${pathIdNum}`}
               variant="outline"
             >
               Cancel
             </Button>
-            <Button type="submit" mt="md">
-              Submit
-            </Button>
+            <Button type="submit">Submit</Button>
           </Group>
         </form>
 
@@ -151,12 +148,13 @@ function NewBooking() {
               {form.values.request ? form.values.request : "None"}
             </li>
           </ul>
+          <Text mt="md">Are you sure you want to proceed?</Text>
           <Group justify="center" mt="xl">
-            <Button type="button" mt="md" variant="outline" onClick={toggle}>
-              Cancel
+            <Button type="button" variant="outline" onClick={toggle}>
+              Back
             </Button>
-            <Button type="submit" mt="md" onClick={handleSubmit}>
-              Submit
+            <Button type="submit" onClick={handleSubmit}>
+              Proceed
             </Button>
           </Group>
         </Modal>
