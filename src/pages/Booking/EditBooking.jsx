@@ -12,7 +12,10 @@ import {
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import { Link, useLocation } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+} from "react-router-dom";
 import { restaurants } from "../../assets/sampleData/restaurant";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
@@ -129,7 +132,7 @@ function EditBooking() {
               type="button"
               mt="md"
               component={Link}
-              to={`/restaurant/${pathIdNum}`}
+              to="/account/bookings"
               variant="outline"
             >
               Cancel
