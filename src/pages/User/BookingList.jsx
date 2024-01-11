@@ -45,6 +45,7 @@ function BookingList() {
       </Table.Td>
       <Table.Td>{row.date}</Table.Td>
       <Table.Td>{row.time}</Table.Td>
+      <Table.Td>{row.pax}</Table.Td>
       <Table.Td>{row.request}</Table.Td>
 
       <Table.Td w="85px">
@@ -63,15 +64,13 @@ function BookingList() {
   return (
     <>
       <ScrollArea>
-        <Table
-          verticalSpacing="xs"
-          miw={700}
-        >
+        <Table verticalSpacing="xs" miw={700}>
           <Table.Tbody>
             <Table.Tr>
               <Th>Restaurant</Th>
               <Th>Date</Th>
               <Th>Time</Th>
+              <Th>Pax</Th>
               <Th>Request</Th>
             </Table.Tr>
           </Table.Tbody>
