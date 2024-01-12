@@ -18,7 +18,11 @@ import EditBooking from "./pages/Booking/EditBooking";
 import { Layout } from "./components/Layout/Layout";
 import RestaurantList from "./pages/Restaurant/RestaurantList";
 import RestaurantDetail from "./pages/Restaurant/RestaurantDetail";
+import { Notifications } from "@mantine/notifications";
+import "@mantine/notifications/styles.css";
+import "@mantine/dates/styles.css";
 
+// https://mantine.dev/theming/default-theme/
 const theme = createTheme({
   fontFamily: "Montserrat, sans-serif",
   defaultRadius: "md",
@@ -29,6 +33,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Router>
       <MantineProvider theme={theme} defaultColorScheme="light">
+        <Notifications />
         <Routes>
           <Route path="/" element={<Layout />}>
             {/* Root */}
