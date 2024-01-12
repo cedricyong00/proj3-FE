@@ -2,7 +2,9 @@ import {
   ActionIcon,
   Box,
   Button,
+  Container,
   Group,
+  Loader,
   Modal,
   NumberInput,
   Textarea,
@@ -12,38 +14,52 @@ import {
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import {
-  Link,
-  useLocation,
-} from "react-router-dom";
-import { restaurants } from "../../assets/sampleData/restaurant";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 
 function EditBooking() {
+  const navigate = useNavigate();
   const [opened, { toggle, close }] = useDisclosure(false);
 
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
-  const pathIdNum = parseInt(pathId);
 
-  const restaurantData = restaurants.find(
-    (restaurant) => restaurant.id === pathIdNum
-  );
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getSingleBooking();
+  }, []);
+
+  const getSingleBooking = async () => {
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/bookings/${pathId}`
+    );
+    const data = await res.json();
+    setLoading(false);
+
+    form.setValues({
+      pax: data.booking.pax,
+      date: new Date(data.booking.dateTime),
+      time: dayjs(data.booking.dateTime).utc().local().format("HH:mm"),
+      request: data.booking.request,
+    });
+
+    return data;
+  };
 
   const form = useForm({
     validate: {
       pax: (value) =>
-        value === undefined
-          ? "Please enter a number"
-          : value < 1
-          ? "Minimum 1 pax"
-          : value > restaurantData.maxPax
-          ? "Maximum " + restaurantData.maxPax + " pax"
-          : value > 10 &&
-            "For large group, please contact the restaurant directly",
+        value === undefined ? "Please enter a number" : value < 1,
+      // TODO: Fetch restaurant data from API
+      // ? "Minimum 1 pax"
+      // : value > restaurantData.maxPax
+      // ? "Maximum " + restaurantData.maxPax + " pax"
+      // : value > 10 &&
+      //   "For large group, please contact the restaurant directly",
       date: (value) =>
         value === undefined
           ? "Please enter a date"
@@ -57,14 +73,41 @@ function EditBooking() {
     },
   });
 
-  const handleSubmit = () => {
-    close();
-    notifications.show({
-      title: "Table Reserved!",
-      message: "You will receive a confirmation email shortly",
-      autoClose: 5000,
-    });
-    console.log(form.values);
+  const handleSubmit = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/bookings/${pathId}/edit/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            // TODO add time
+            dateTime: form.values.date,
+            pax: form.values.pax,
+            request: form.values.request,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error("Something went wrong");
+      close();
+      navigate("/account/bookings");
+      notifications.show({
+        title: "Table Reserved!",
+        message: "You will receive a confirmation email shortly",
+        autoClose: 5000,
+      });
+    } catch (err) {
+      console.log(err);
+      close();
+      notifications.show({
+        title: "Something went wrong!",
+        message: "Please try again later",
+        autoClose: 5000,
+        color: "red",
+      });
+    }
   };
 
   const ref = useRef(null);
@@ -81,89 +124,102 @@ function EditBooking() {
 
   return (
     <>
-      <Title order={2} ta="center">
-        Reserve a table at {restaurantData.name}
-      </Title>
-      <Box maw={340} mx="auto" mt="xl">
-        <form
-          onSubmit={form.onSubmit((values) => {
-            console.log(values);
-            // toggle();
-            if (form.isValid) {
-              toggle();
-            }
-          })}
-        >
-          <DateInput
-            mt="md"
-            valueFormat="DD/MM/YYYY"
-            label="Date"
-            placeholder="01/03/2024"
-            {...form.getInputProps("date")}
-          />
-
-          <TimeInput
-            label="Time"
-            mt="md"
-            ref={ref}
-            rightSection={pickerControl}
-            {...form.getInputProps("time")}
-          />
-
-          <NumberInput
-            label="Number of Pax"
-            placeholder="2"
-            min={1}
-            mt="md"
-            {...form.getInputProps("pax")}
-          />
-
-          <Textarea
-            label="Special Request (If any)"
-            mt="md"
-            placeholder="Child sheet, wheelchair, etc."
-            autosize="true"
-            minRows={3}
-            {...form.getInputProps("request")}
-          />
-
-          <Group justify="center" mt="xl">
-            <Button
-              type="button"
-              mt="md"
-              component={Link}
-              to="/account/bookings"
-              variant="outline"
+      {loading ? (
+        <Container ta="center" mt="xl">
+          <Loader />
+        </Container>
+      ) : (
+        <>
+          <Title order={2} ta="center">
+            {/* TODO */}
+            Reserve a table at Wildfire Steakhouse
+          </Title>
+          <Box maw={340} mx="auto" mt="xl">
+            <form
+              onSubmit={form.onSubmit(() => {
+                if (form.isValid) {
+                  toggle();
+                }
+              })}
             >
-              Cancel
-            </Button>
-            <Button type="submit" mt="md">
-              Submit
-            </Button>
-          </Group>
-        </form>
+              <DateInput
+                mt="md"
+                valueFormat="DD/MM/YYYY"
+                label="Date"
+                placeholder="01/03/2024"
+                {...form.getInputProps("date")}
+              />
 
-        {/* Modal */}
-        <Modal opened={opened} onClose={close} title="Reserve a Table">
-          <ul>
-            <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-            <li>Time: {form.values.time}</li>
-            <li>Table for: {form.values.pax}</li>
-            <li>
-              Special Request:{" "}
-              {form.values.request ? form.values.request : "None"}
-            </li>
-          </ul>
-          <Group justify="center" mt="xl">
-            <Button type="button" mt="md" variant="outline" onClick={toggle}>
-              Cancel
-            </Button>
-            <Button type="submit" mt="md" onClick={handleSubmit}>
-              Submit
-            </Button>
-          </Group>
-        </Modal>
-      </Box>
+              <TimeInput
+                label="Time"
+                mt="md"
+                ref={ref}
+                rightSection={pickerControl}
+                {...form.getInputProps("time")}
+              />
+
+              <NumberInput
+                label="Number of Pax"
+                placeholder="2"
+                min={1}
+                mt="md"
+                {...form.getInputProps("pax")}
+              />
+
+              <Textarea
+                label="Special Request (If any)"
+                mt="md"
+                placeholder="Child sheet, wheelchair, etc."
+                autosize="true"
+                minRows={3}
+                {...form.getInputProps("request")}
+              />
+
+              <Group justify="center" mt="xl">
+                <Button
+                  type="button"
+                  mt="md"
+                  component={Link}
+                  to="/account/bookings"
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" mt="md">
+                  Submit
+                </Button>
+              </Group>
+            </form>
+
+            {/* Modal */}
+            <Modal opened={opened} onClose={close} title="Reserve a Table">
+              <ul>
+                <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
+                {/* TODO */}
+                <li>Time: {form.values.time}</li>
+                <li>Table for: {form.values.pax}</li>
+                <li>
+                  Special Request:{" "}
+                  {form.values.request ? form.values.request : "None"}
+                </li>
+              </ul>
+              <Group justify="center" mt="xl">
+                <Button
+                  type="button"
+                  mt="md"
+                  variant="outline"
+                  onClick={toggle}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" mt="md" onClick={handleSubmit}>
+                  Submit
+                </Button>
+              </Group>
+            </Modal>
+          </Box>
+        </>
+      )}
     </>
   );
 }

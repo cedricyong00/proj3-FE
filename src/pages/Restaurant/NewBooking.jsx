@@ -13,15 +13,17 @@ import {
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { restaurants } from "../../assets/sampleData/restaurant";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import dayjs from "dayjs";
 
 function NewBooking() {
   const [opened, { toggle, close }] = useDisclosure(false);
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
@@ -46,23 +48,52 @@ function NewBooking() {
         value === undefined
           ? "Please enter a date"
           : value < new Date() && "Date must be in the future",
-      time: (value) =>
-        value === undefined
-          ? "Please enter a time"
-          : value < new Date() && "Time must be in the future",
+      time: (value) => value === undefined && "Please enter a time",
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
 
-  const handleSubmit = () => {
-    close();
-    notifications.show({
-      title: "Table Reserved!",
-      message: "You will receive a confirmation email shortly",
-      autoClose: 5000,
-    });
+  const handleSubmit = async () => {
     console.log(form.values);
+    setSubmitting(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/bookings/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            // TODO add time
+            dateTime: form.values.date,
+            pax: form.values.pax,
+            request: form.values.request,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error("Something went wrong");
+      const data = await res.json();
+      console.log(data);
+      setSubmitting(false);
+      navigate("/account/bookings");
+      close();
+      notifications.show({
+        title: "Table Reserved!",
+        message: "You will receive a confirmation email shortly",
+        autoClose: 5000,
+      });
+    } catch (err) {
+      console.log(err);
+      close();
+      notifications.show({
+        title: "Something went wrong!",
+        message: "Please try again later",
+        autoClose: 5000,
+        color: "red",
+      });
+    }
   };
 
   const ref = useRef(null);
@@ -141,6 +172,7 @@ function NewBooking() {
         <Modal opened={opened} onClose={close} title="Reserve a Table">
           <ul>
             <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
+            {/* TOTO change format to hh:mm A */}
             <li>Time: {form.values.time}</li>
             <li>Table for: {form.values.pax}</li>
             <li>
@@ -153,7 +185,7 @@ function NewBooking() {
             <Button type="button" variant="outline" onClick={toggle}>
               Back
             </Button>
-            <Button type="submit" onClick={handleSubmit}>
+            <Button type="submit" onClick={handleSubmit} loading={submitting}>
               Proceed
             </Button>
           </Group>
