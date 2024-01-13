@@ -37,7 +37,7 @@ function BookingList() {
   }, []);
 
   const getList = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings`);
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/booking`);
     const data = await res.json();
 
     setData(data);
@@ -48,7 +48,7 @@ function BookingList() {
   const handleSubmit = async () => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/bookings/${dataToCancel._id}/delete`,
+        `${import.meta.env.VITE_API_URL}/booking/${dataToCancel._id}/delete`,
         {
           method: "DELETE",
         }

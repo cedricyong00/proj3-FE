@@ -59,7 +59,7 @@ function NewBooking() {
     setSubmitting(true);
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/bookings/create`,
+        `${import.meta.env.VITE_API_URL}/booking/create`,
         {
           method: "POST",
           headers: {

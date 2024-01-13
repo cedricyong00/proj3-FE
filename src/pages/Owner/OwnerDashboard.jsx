@@ -42,7 +42,7 @@ function OwnerDashboard() {
   }, []);
 
   const getList = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings`);
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/booking`);
     const data = await res.json();
     setData(data);
     setLoading(false);

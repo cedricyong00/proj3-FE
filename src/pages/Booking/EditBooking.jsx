@@ -35,7 +35,7 @@ function EditBooking() {
 
   const getSingleBooking = async () => {
     const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/bookings/${pathId}`
+      `${import.meta.env.VITE_API_URL}/booking/${pathId}`
     );
     const data = await res.json();
     setLoading(false);
@@ -76,7 +76,7 @@ function EditBooking() {
   const handleSubmit = async () => {
     try {
       const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/bookings/${pathId}/edit/`,
+        `${import.meta.env.VITE_API_URL}/booking/${pathId}/edit/`,
         {
           method: "PUT",
           headers: {
