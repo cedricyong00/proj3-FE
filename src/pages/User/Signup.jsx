@@ -8,10 +8,10 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import EmailSignUp from "../../components/Layout/EmailSignUp";
+import EmailSignUp from "../../components/User/EmailSignUp";
 import classes from "./Signin.module.css";
 import { Header } from "../../components/Layout/Header";
-import CheckboxCard from "../../components/Layout/Checkbox";
+import CheckboxCard from "../../components/User/Checkbox";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -46,7 +46,7 @@ function SignUpPage() {
           Welcome!
         </Title>
         <Text c="dimmed" size="sm" ta="center" mt={5}>
-          Already have an account{" "}
+          Already have an account?{" "}
           <Anchor size="sm" component={Link} to="/signin">
             Sign in
           </Anchor>
@@ -62,7 +62,7 @@ function SignUpPage() {
           />
           <br />
           <CheckboxCard isOwner={isOwner} setIsOwner={setIsOwner} />
-          
+
           <Button fullWidth mt="xl" onClick={handleSubmit}>
             Sign Up
           </Button>
