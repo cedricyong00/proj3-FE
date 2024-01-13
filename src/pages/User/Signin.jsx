@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {
   Anchor,
   Button,
@@ -9,15 +10,34 @@ import {
   Title,
 } from "@mantine/core";
 import classes from "./Signin.module.css";
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Header } from "../../components/Layout/Header";
 
 function SignInPage() {
+  //Function to redirect users upon clicking button
+  const navigate = useNavigate();
+
+  //Handle change in form fields
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  //Function to handle submit events
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const loginDetails = {
+      Email: email,
+      Password: password,
+    };
+    setTimeout(() => {
+      navigate("/");
+    }, 5000);
+  };
+
   return (
     <>
-      {/* Redirects to signup page */}
-      <a href="/signup">SIGN UP</a>
-      <br />
-      <a href="/owner/bookings">OWNER DASHBOARD</a>
+      {/* Header Component */}
+      <Header />
 
       <Container size={420} my={40}>
         <Title ta="center" className={classes.title}>
@@ -30,14 +50,20 @@ function SignInPage() {
           </Anchor>
         </Text>
         <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-          <TextInput label="Email" placeholder="Enter Your Email" required />
+          <TextInput
+            label="Email"
+            placeholder="Enter Your Email"
+            required
+            onChange={(e) => setEmail(e.target.value)}
+          />
           <PasswordInput
             label="Password"
             placeholder="Enter Your Password"
             required
             mt="md"
+            onChange={(e) => setPassword(e.target.value)}
           />
-          <Button fullWidth mt="xl">
+          <Button fullWidth mt="xl" onClick={handleSubmit}>
             Sign in
           </Button>
         </Paper>
