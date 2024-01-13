@@ -6,6 +6,7 @@ function useFetch() {
       options.body = JSON.stringify(payload);
     }
 
+    // TODO
     // const token = getToken();
     // if (token) {
     //   options.headers = options.headers || {};
