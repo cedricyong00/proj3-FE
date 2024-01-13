@@ -18,6 +18,7 @@ import { useEffect, useRef, useState } from "react";
 import { IconClock } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
+import useFetch from "../../hooks/useFetch";
 
 function Th({ children }) {
   return (
@@ -34,20 +35,23 @@ function OwnerDashboard() {
   const [dateTo, setDateTo] = useState(new Date());
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { sendRequest } = useFetch();
 
   const theme = useMantineTheme();
   const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
 
   useEffect(() => {
     getList();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getList = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/booking`);
-    const data = await res.json();
-    setData(data);
+    const resData = await sendRequest(
+      `${import.meta.env.VITE_API_URL}/booking`,
+      "GET"
+    );
+    setData(resData);
     setLoading(false);
-    return data;
   };
 
   const rows = data.map((row) => (
@@ -146,9 +150,9 @@ function OwnerDashboard() {
                 {rows.length > 0 ? (
                   rows
                 ) : (
-                    <Text fw={500} ta="center">
-                      Nothing found
-                    </Text>
+                  <Text fw={500} ta="center">
+                    Nothing found
+                  </Text>
                 )}
               </Table.Tbody>
             </Table>

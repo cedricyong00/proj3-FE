@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
+import useFetch from "../../hooks/useFetch";
 
 function Th({ children }) {
   return (
@@ -30,34 +31,30 @@ function BookingList() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dataToCancel, setDataToCancel] = useState([]);
-
+  const { sendRequest } = useFetch();
   useEffect(() => {
     getList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getList = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/booking`);
-    const data = await res.json();
-
-    setData(data);
+    const resData = await sendRequest(
+      `${import.meta.env.VITE_API_URL}/booking`,
+      "GET"
+    );
+    setData(resData);
     setLoading(false);
-    return data;
   };
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch(
+      await sendRequest(
         `${import.meta.env.VITE_API_URL}/booking/${dataToCancel._id}/delete`,
-        {
-          method: "DELETE",
-        }
+        "DELETE"
       );
-      const data = await res.json();
-      console.log(data);
       setData((prev) =>
         prev.filter((booking) => booking._id !== dataToCancel._id)
       );
-
       close();
       notifications.show({
         title: "Table canceled!",

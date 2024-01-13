@@ -18,11 +18,12 @@ import { notifications } from "@mantine/notifications";
 import { useRef } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
+import useFetch from "../../hooks/useFetch";
 
 function NewBooking() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const navigate = useNavigate();
-
+  const { sendRequest } = useFetch();
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
   const pathIdNum = parseInt(pathId);
@@ -54,25 +55,19 @@ function NewBooking() {
 
   const handleSubmit = async () => {
     console.log(form.values);
+
     try {
-      const res = await fetch(
+      const res = await sendRequest(
         `${import.meta.env.VITE_API_URL}/booking/create`,
+        "POST",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            // TODO: add time
-            dateTime: form.values.date,
-            pax: form.values.pax,
-            request: form.values.request,
-          }),
+          // TODO: add time
+          dateTime: form.values.date,
+          pax: form.values.pax,
+          request: form.values.request,
         }
       );
-      if (!res.ok) throw new Error("Something went wrong");
-      const data = await res.json();
-      console.log(data);
+      console.log(res);
       navigate("/account/bookings");
       close();
       notifications.show({

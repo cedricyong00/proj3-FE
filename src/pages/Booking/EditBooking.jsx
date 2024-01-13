@@ -19,36 +19,33 @@ import { notifications } from "@mantine/notifications";
 import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
+import useFetch from "../../hooks/useFetch";
 
 function EditBooking() {
   const navigate = useNavigate();
   const [opened, { toggle, close }] = useDisclosure(false);
-
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
-
   const [loading, setLoading] = useState(true);
+  const { sendRequest } = useFetch();
 
   useEffect(() => {
     getSingleBooking();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getSingleBooking = async () => {
-    const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/booking/${pathId}`
+    const data = await sendRequest(
+      `${import.meta.env.VITE_API_URL}/booking/${pathId}`,
+      "GET"
     );
-    const data = await res.json();
     setLoading(false);
-
     form.setValues({
       pax: data.booking.pax,
       date: new Date(data.booking.dateTime),
       time: dayjs(data.booking.dateTime).utc().local().format("HH:mm"),
       request: data.booking.request,
     });
-
-    return data;
   };
 
   const form = useForm({
@@ -76,22 +73,16 @@ function EditBooking() {
 
   const handleSubmit = async () => {
     try {
-      const res = await fetch(
+      await sendRequest(
         `${import.meta.env.VITE_API_URL}/booking/${pathId}/edit/`,
+        "PUT",
         {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            // TODO add time
-            dateTime: form.values.date,
-            pax: form.values.pax,
-            request: form.values.request,
-          }),
+          // TODO add time
+          dateTime: form.values.date,
+          pax: form.values.pax,
+          request: form.values.request,
         }
       );
-      if (!res.ok) throw new Error("Something went wrong");
       close();
       navigate("/account/bookings");
       notifications.show({
