@@ -1,28 +1,21 @@
 /* eslint-disable react/prop-types */
-import { UnstyledButton, Checkbox, Text } from '@mantine/core';
-import classes from './Checkbox.module.css';
+import { UnstyledButton, Checkbox } from "@mantine/core";
 
-function CheckboxCard({isOwner, setIsOwner}) {
-
+function CheckboxCard({ isOwner, setIsOwner }) {
   return (
-    <UnstyledButton onClick={() => setIsOwner(!isOwner)} className={classes.button}>
+    <UnstyledButton onClick={() => setIsOwner(!isOwner)}>
       <Checkbox
         checked={isOwner}
         onChange={() => {}}
         tabIndex={-1}
         size="md"
         mr="xl"
-        styles={{ input: { cursor: 'pointer' } }}
+        styles={{ input: { cursor: "pointer" } }}
         aria-hidden
+        label="I am an owner of a restaurant"
       />
-
-      <div>
-        <Text fw={500} mb={7} lh={1}>
-        Owner of a restaurant
-        </Text>
-      </div>
     </UnstyledButton>
   );
 }
 
-export default CheckboxCard
+export default CheckboxCard;

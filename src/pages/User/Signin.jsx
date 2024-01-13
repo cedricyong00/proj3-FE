@@ -11,7 +11,7 @@ import {
 } from "@mantine/core";
 import classes from "./Signin.module.css";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Header } from "../../components/Layout/Header";
 
 function SignInPage() {
@@ -36,16 +36,13 @@ function SignInPage() {
 
   return (
     <>
-      {/* Header Component */}
-      <Header />
-
       <Container size={420} my={40}>
         <Title ta="center" className={classes.title}>
           Welcome back!
         </Title>
         <Text c="dimmed" size="sm" ta="center" mt={5}>
           Do not have an account yet?{" "}
-          <Anchor size="sm" href="/signup">
+          <Anchor size="sm" component={Link} to="/signup">
             Create account
           </Anchor>
         </Text>
