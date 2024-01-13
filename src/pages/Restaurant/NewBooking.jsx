@@ -3,9 +3,7 @@ import {
   Box,
   Button,
   Group,
-  Modal,
   NumberInput,
-  Text,
   Textarea,
   Title,
   rem,
@@ -17,12 +15,12 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { restaurants } from "../../assets/sampleData/restaurant";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import dayjs from "dayjs";
+import Modal from "../../components/Parts/Modal";
 
 function NewBooking() {
   const [opened, { toggle, close }] = useDisclosure(false);
-  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -56,7 +54,6 @@ function NewBooking() {
 
   const handleSubmit = async () => {
     console.log(form.values);
-    setSubmitting(true);
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/booking/create`,
@@ -66,7 +63,7 @@ function NewBooking() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            // TODO add time
+            // TODO: add time
             dateTime: form.values.date,
             pax: form.values.pax,
             request: form.values.request,
@@ -76,7 +73,6 @@ function NewBooking() {
       if (!res.ok) throw new Error("Something went wrong");
       const data = await res.json();
       console.log(data);
-      setSubmitting(false);
       navigate("/account/bookings");
       close();
       notifications.show({
@@ -106,6 +102,18 @@ function NewBooking() {
     >
       <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
     </ActionIcon>
+  );
+
+  const modalContent = (
+    <ul>
+      <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
+      {/* TOTO change format to hh:mm A */}
+      <li>Time: {form.values.time}</li>
+      <li>Table for: {form.values.pax}</li>
+      <li>
+        Special Request: {form.values.request ? form.values.request : "None"}
+      </li>
+    </ul>
   );
 
   return (
@@ -169,27 +177,14 @@ function NewBooking() {
         </form>
 
         {/* Modal */}
-        <Modal opened={opened} onClose={close} title="Reserve a Table">
-          <ul>
-            <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-            {/* TOTO change format to hh:mm A */}
-            <li>Time: {form.values.time}</li>
-            <li>Table for: {form.values.pax}</li>
-            <li>
-              Special Request:{" "}
-              {form.values.request ? form.values.request : "None"}
-            </li>
-          </ul>
-          <Text mt="md">Are you sure you want to proceed?</Text>
-          <Group justify="center" mt="xl">
-            <Button type="button" variant="outline" onClick={toggle}>
-              Back
-            </Button>
-            <Button type="submit" onClick={handleSubmit} loading={submitting}>
-              Proceed
-            </Button>
-          </Group>
-        </Modal>
+        <Modal
+          opened={opened}
+          title="Reserve a Table"
+          modalContent={modalContent}
+          toggle={toggle}
+          close={close}
+          handleSubmit={handleSubmit}
+        />
       </Box>
     </>
   );

@@ -4,16 +4,15 @@ import {
   Group,
   Text,
   Button,
-  Modal,
   ActionIcon,
   rem,
   Container,
   Loader,
   Anchor,
+  useMantineTheme,
 } from "@mantine/core";
 import PropTypes from "prop-types";
-import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
+import { useMediaQuery } from "@mantine/hooks";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import { useEffect, useRef, useState } from "react";
 import { IconClock } from "@tabler/icons-react";
@@ -31,11 +30,13 @@ function Th({ children }) {
 }
 
 function OwnerDashboard() {
-  const [opened, { toggle, close }] = useDisclosure(false);
   const [dateFrom, setDateFrom] = useState(new Date());
   const [dateTo, setDateTo] = useState(new Date());
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const theme = useMantineTheme();
+  const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
 
   useEffect(() => {
     getList();
@@ -47,15 +48,6 @@ function OwnerDashboard() {
     setData(data);
     setLoading(false);
     return data;
-  };
-
-  const handleSubmit = () => {
-    close();
-    notifications.show({
-      title: "Table canceled!",
-      message: "You will receive a confirmation email shortly",
-      autoClose: 5000,
-    });
   };
 
   const rows = data.map((row) => (
@@ -107,32 +99,33 @@ function OwnerDashboard() {
         </Text>
       ) : (
         <>
+          {/* TODO: Apply filter logic */}
           <Group align="flex-end">
             <DatePickerInput
               label="Date From"
               placeholder="Pick date"
               value={dateFrom}
               onChange={setDateFrom}
-              miw="150px"
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
             />
             <DatePickerInput
               label="Date To"
               placeholder="Pick date"
               value={dateTo}
               onChange={setDateTo}
-              miw="150px"
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
             />
             <TimeInput
               label="Time From"
               ref={refFrom}
               rightSection={pickerControlFrom}
-              miw="150px"
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
             />
             <TimeInput
               label="Time To"
               ref={refTo}
               rightSection={pickerControlTo}
-              miw="150px"
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
             />
             <Button>Filter</Button>
           </Group>
@@ -153,41 +146,13 @@ function OwnerDashboard() {
                 {rows.length > 0 ? (
                   rows
                 ) : (
-                  <Table.Tr>
-                    {/* <Table.Td colSpan={Object.keys(data[0]).length}> */}
                     <Text fw={500} ta="center">
                       Nothing found
                     </Text>
-                    {/* </Table.Td> */}
-                  </Table.Tr>
                 )}
               </Table.Tbody>
             </Table>
           </ScrollArea>
-
-          {/* Modal */}
-          <Modal
-            opened={opened}
-            onClose={close}
-            title="Cancel a table reservation"
-          >
-            <ul>
-              <li>Date: 04/01/2024</li>
-              <li>Time: 18:00</li>
-              <li>Table for: 3</li>
-              <li>Special Request: None</li>
-            </ul>
-
-            <Text mt="md">Are you sure you want to proceed?</Text>
-            <Group justify="center" mt="xl">
-              <Button type="button" variant="outline" onClick={toggle}>
-                Back
-              </Button>
-              <Button type="submit" onClick={handleSubmit}>
-                Proceed
-              </Button>
-            </Group>
-          </Modal>
         </>
       )}
     </>

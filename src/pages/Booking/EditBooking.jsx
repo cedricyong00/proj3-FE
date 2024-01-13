@@ -5,7 +5,6 @@ import {
   Container,
   Group,
   Loader,
-  Modal,
   NumberInput,
   Textarea,
   Title,
@@ -19,6 +18,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
+import Modal from "../../components/Parts/Modal";
 
 function EditBooking() {
   const navigate = useNavigate();
@@ -31,6 +31,7 @@ function EditBooking() {
 
   useEffect(() => {
     getSingleBooking();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getSingleBooking = async () => {
@@ -122,6 +123,18 @@ function EditBooking() {
     </ActionIcon>
   );
 
+  const modalContent = (
+    <ul>
+      <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
+      {/* TODO */}
+      <li>Time: {form.values.time}</li>
+      <li>Table for: {form.values.pax}</li>
+      <li>
+        Special Request: {form.values.request ? form.values.request : "None"}
+      </li>
+    </ul>
+  );
+
   return (
     <>
       {loading ? (
@@ -192,31 +205,14 @@ function EditBooking() {
             </form>
 
             {/* Modal */}
-            <Modal opened={opened} onClose={close} title="Reserve a Table">
-              <ul>
-                <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-                {/* TODO */}
-                <li>Time: {form.values.time}</li>
-                <li>Table for: {form.values.pax}</li>
-                <li>
-                  Special Request:{" "}
-                  {form.values.request ? form.values.request : "None"}
-                </li>
-              </ul>
-              <Group justify="center" mt="xl">
-                <Button
-                  type="button"
-                  mt="md"
-                  variant="outline"
-                  onClick={toggle}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" mt="md" onClick={handleSubmit}>
-                  Submit
-                </Button>
-              </Group>
-            </Modal>
+            <Modal
+              modalContent={modalContent}
+              opened={opened}
+              toggle={toggle}
+              close={close}
+              handleSubmit={handleSubmit}
+              title="Edit a Table Reservation"
+            />
           </Box>
         </>
       )}

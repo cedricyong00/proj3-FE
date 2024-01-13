@@ -1,10 +1,8 @@
 import {
   Table,
   ScrollArea,
-  Group,
   Text,
   Button,
-  Modal,
   Anchor,
   Loader,
   Container,
@@ -15,6 +13,7 @@ import { notifications } from "@mantine/notifications";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import Modal from "../../components/Parts/Modal";
 
 function Th({ children }) {
   return (
@@ -56,7 +55,6 @@ function BookingList() {
       const data = await res.json();
       console.log(data);
       setData((prev) =>
-        // prev.filter((recipe) => recipe.fields.recipeId !== recipeId)
         prev.filter((booking) => booking._id !== dataToCancel._id)
       );
 
@@ -111,6 +109,18 @@ function BookingList() {
     </Table.Tr>
   ));
 
+  const modalContent = (
+    <ul>
+      <li>Date: {dayjs(dataToCancel.dateTime).format("DD/MM/YYYY")}</li>
+      <li>Time: {dayjs(dataToCancel.dateTime).format("hh:mmA")}</li>
+      <li>Table for: {dataToCancel.pax}</li>
+      <li>
+        Special Request:
+        {dataToCancel.request ? dataToCancel.request : "None"}
+      </li>
+    </ul>
+  );
+
   return (
     <>
       {loading ? (
@@ -144,29 +154,12 @@ function BookingList() {
           {/* Modal */}
           <Modal
             opened={opened}
-            onClose={close}
             title="Cancel a table reservation"
-          >
-            <ul>
-              <li>Date: {dayjs(dataToCancel.dateTime).format("DD/MM/YYYY")}</li>
-              <li>Time: {dayjs(dataToCancel.dateTime).format("hh:mmA")}</li>
-              <li>Table for: {dataToCancel.pax}</li>
-              <li>
-                Special Request:
-                {dataToCancel.request ? dataToCancel.request : "None"}
-              </li>
-            </ul>
-
-            <Text mt="md">Are you sure you want to proceed?</Text>
-            <Group justify="center" mt="xl">
-              <Button type="button" variant="outline" onClick={toggle}>
-                Back
-              </Button>
-              <Button type="submit" onClick={handleSubmit}>
-                Proceed
-              </Button>
-            </Group>
-          </Modal>
+            modalContent={modalContent}
+            toggle={toggle}
+            close={close}
+            handleSubmit={handleSubmit}
+          />
         </>
       )}
     </>
