@@ -39,6 +39,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             {/* Root */}
             <Route index element={<RestaurantList />} />
 
+            {/* Auth */}
+            <Route path="/signin" element={<SignInPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
+
             {/* Account */}
             <Route path="/account" element={<Account />} />
             <Route path="/account/edit" element={<EditAccount />} />
@@ -59,10 +63,6 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/owner/restaurant/new" element={<NewRestaurant />} />
             <Route path="/owner/restaurant/edit" element={<EditAccount />} />
           </Route>
-
-          {/* Auth */}
-          <Route path="/signin" element={<SignInPage />} />
-          <Route path="/signup" element={<SignUpPage />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFound />} />
