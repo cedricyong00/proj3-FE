@@ -14,11 +14,11 @@ import { IconClock } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { restaurants } from "../../assets/sampleData/restaurant";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { useRef } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
+import useToast from "../../hooks/useToast";
 
 function NewBooking() {
   const [opened, { toggle, close }] = useDisclosure(false);
@@ -27,6 +27,7 @@ function NewBooking() {
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
   const pathIdNum = parseInt(pathId);
+  const { successToast, errorToast } = useToast();
 
   const restaurantData = restaurants.find(
     (restaurant) => restaurant.id === pathIdNum
@@ -70,20 +71,14 @@ function NewBooking() {
       console.log(res);
       navigate("/account/bookings");
       close();
-      notifications.show({
+      successToast({
         title: "Table Reserved!",
         message: "You will receive a confirmation email shortly",
-        autoClose: 5000,
       });
     } catch (err) {
       console.log(err);
       close();
-      notifications.show({
-        title: "Something went wrong!",
-        message: "Please try again later",
-        autoClose: 5000,
-        color: "red",
-      });
+      errorToast();
     }
   };
 
@@ -118,8 +113,7 @@ function NewBooking() {
       </Title>
       <Box maw={340} mx="auto" mt="xl">
         <form
-          onSubmit={form.onSubmit((values) => {
-            console.log(values);
+          onSubmit={form.onSubmit(() => {
             if (form.isValid) {
               toggle();
             }

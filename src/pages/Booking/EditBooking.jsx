@@ -2,9 +2,7 @@ import {
   ActionIcon,
   Box,
   Button,
-  Container,
   Group,
-  Loader,
   NumberInput,
   Textarea,
   Title,
@@ -15,11 +13,12 @@ import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import useToast from "../../hooks/useToast";
 
 function EditBooking() {
   const navigate = useNavigate();
@@ -28,6 +27,8 @@ function EditBooking() {
   const pathId = location.pathname.split("/")[2];
   const [loading, setLoading] = useState(true);
   const { sendRequest } = useFetch();
+  const ref = useRef(null);
+  const { successToast, errorToast } = useToast();
 
   useEffect(() => {
     getSingleBooking();
@@ -85,24 +86,16 @@ function EditBooking() {
       );
       close();
       navigate("/account/bookings");
-      notifications.show({
+      successToast({
         title: "Table Reserved!",
         message: "You will receive a confirmation email shortly",
-        autoClose: 5000,
       });
     } catch (err) {
       console.log(err);
       close();
-      notifications.show({
-        title: "Something went wrong!",
-        message: "Please try again later",
-        autoClose: 5000,
-        color: "red",
-      });
+      errorToast();
     }
   };
-
-  const ref = useRef(null);
 
   const pickerControl = (
     <ActionIcon
@@ -129,9 +122,7 @@ function EditBooking() {
   return (
     <>
       {loading ? (
-        <Container ta="center" mt="xl">
-          <Loader />
-        </Container>
+        <LoadingSpinner />
       ) : (
         <>
           <Title order={2} ta="center">

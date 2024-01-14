@@ -1,20 +1,13 @@
-import {
-  Table,
-  ScrollArea,
-  Text,
-  Button,
-  Anchor,
-  Loader,
-  Container,
-} from "@mantine/core";
+import { Table, ScrollArea, Text, Button, Anchor } from "@mantine/core";
 import PropTypes from "prop-types";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import useToast from "../../hooks/useToast";
 
 function Th({ children }) {
   return (
@@ -32,6 +25,8 @@ function BookingList() {
   const [loading, setLoading] = useState(true);
   const [dataToCancel, setDataToCancel] = useState([]);
   const { sendRequest } = useFetch();
+  const { successToast, errorToast } = useToast();
+
   useEffect(() => {
     getList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -56,20 +51,14 @@ function BookingList() {
         prev.filter((booking) => booking._id !== dataToCancel._id)
       );
       close();
-      notifications.show({
+      successToast({
         title: "Table canceled!",
         message: "You will receive a confirmation email shortly",
-        autoClose: 5000,
       });
     } catch (err) {
       console.log(err);
       close();
-      notifications.show({
-        title: "Something went wrong!",
-        message: "Please try later.",
-        color: "red",
-        autoClose: 5000,
-      });
+      errorToast();
     }
   };
 
@@ -121,9 +110,7 @@ function BookingList() {
   return (
     <>
       {loading ? (
-        <Container ta="center" mt="xl">
-          <Loader />
-        </Container>
+        <LoadingSpinner />
       ) : rows.length === 0 ? (
         <Text fw={500} ta="center">
           You have no bookings yet. <br />

@@ -6,8 +6,6 @@ import {
   Button,
   ActionIcon,
   rem,
-  Container,
-  Loader,
   Anchor,
   useMantineTheme,
 } from "@mantine/core";
@@ -19,6 +17,7 @@ import { IconClock } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { Link } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 
 function Th({ children }) {
   return (
@@ -42,7 +41,7 @@ function OwnerDashboard() {
 
   useEffect(() => {
     getList();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getList = async () => {
@@ -91,9 +90,7 @@ function OwnerDashboard() {
   return (
     <>
       {loading ? (
-        <Container ta="center" mt="xl">
-          <Loader />
-        </Container>
+        <LoadingSpinner />
       ) : rows.length === 0 ? (
         <Text fw={500} ta="center">
           You have no bookings yet. <br />
