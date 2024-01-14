@@ -3,9 +3,7 @@ import {
   Box,
   Button,
   Group,
-  Modal,
   NumberInput,
-  Text,
   Textarea,
   Title,
   rem,
@@ -13,19 +11,23 @@ import {
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { restaurants } from "../../assets/sampleData/restaurant";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { useRef } from "react";
 import dayjs from "dayjs";
+import Modal from "../../components/Parts/Modal";
+import useFetch from "../../hooks/useFetch";
+import useToast from "../../hooks/useToast";
 
 function NewBooking() {
   const [opened, { toggle, close }] = useDisclosure(false);
-
+  const navigate = useNavigate();
+  const { sendRequest } = useFetch();
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
   const pathIdNum = parseInt(pathId);
+  const { successToast, errorToast } = useToast();
 
   const restaurantData = restaurants.find(
     (restaurant) => restaurant.id === pathIdNum
@@ -46,23 +48,38 @@ function NewBooking() {
         value === undefined
           ? "Please enter a date"
           : value < new Date() && "Date must be in the future",
-      time: (value) =>
-        value === undefined
-          ? "Please enter a time"
-          : value < new Date() && "Time must be in the future",
+      time: (value) => value === undefined && "Please enter a time",
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
 
-  const handleSubmit = () => {
-    close();
-    notifications.show({
-      title: "Table Reserved!",
-      message: "You will receive a confirmation email shortly",
-      autoClose: 5000,
-    });
+  const handleSubmit = async () => {
     console.log(form.values);
+
+    try {
+      const res = await sendRequest(
+        `${import.meta.env.VITE_API_URL}/booking/create`,
+        "POST",
+        {
+          // TODO: add time
+          dateTime: form.values.date,
+          pax: form.values.pax,
+          request: form.values.request,
+        }
+      );
+      console.log(res);
+      navigate("/account/bookings");
+      close();
+      successToast({
+        title: "Table Reserved!",
+        message: "You will receive a confirmation email shortly",
+      });
+    } catch (err) {
+      console.log(err);
+      close();
+      errorToast();
+    }
   };
 
   const ref = useRef(null);
@@ -77,6 +94,18 @@ function NewBooking() {
     </ActionIcon>
   );
 
+  const modalContent = (
+    <ul>
+      <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
+      {/* TOTO change format to hh:mm A */}
+      <li>Time: {form.values.time}</li>
+      <li>Table for: {form.values.pax}</li>
+      <li>
+        Special Request: {form.values.request ? form.values.request : "None"}
+      </li>
+    </ul>
+  );
+
   return (
     <>
       <Title order={2} ta="center">
@@ -84,8 +113,7 @@ function NewBooking() {
       </Title>
       <Box maw={340} mx="auto" mt="xl">
         <form
-          onSubmit={form.onSubmit((values) => {
-            console.log(values);
+          onSubmit={form.onSubmit(() => {
             if (form.isValid) {
               toggle();
             }
@@ -138,26 +166,14 @@ function NewBooking() {
         </form>
 
         {/* Modal */}
-        <Modal opened={opened} onClose={close} title="Reserve a Table">
-          <ul>
-            <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-            <li>Time: {form.values.time}</li>
-            <li>Table for: {form.values.pax}</li>
-            <li>
-              Special Request:{" "}
-              {form.values.request ? form.values.request : "None"}
-            </li>
-          </ul>
-          <Text mt="md">Are you sure you want to proceed?</Text>
-          <Group justify="center" mt="xl">
-            <Button type="button" variant="outline" onClick={toggle}>
-              Back
-            </Button>
-            <Button type="submit" onClick={handleSubmit}>
-              Proceed
-            </Button>
-          </Group>
-        </Modal>
+        <Modal
+          opened={opened}
+          title="Reserve a Table"
+          modalContent={modalContent}
+          toggle={toggle}
+          close={close}
+          handleSubmit={handleSubmit}
+        />
       </Box>
     </>
   );

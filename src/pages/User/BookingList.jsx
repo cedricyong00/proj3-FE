@@ -1,17 +1,13 @@
-import {
-  Table,
-  ScrollArea,
-  Group,
-  Text,
-  Button,
-  Modal,
-  Anchor,
-} from "@mantine/core";
+import { Table, ScrollArea, Text, Button, Anchor } from "@mantine/core";
 import PropTypes from "prop-types";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { Link } from "react-router-dom";
-import { bookings } from "../../assets/sampleData/booking";
+import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import Modal from "../../components/Parts/Modal";
+import useFetch from "../../hooks/useFetch";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import useToast from "../../hooks/useToast";
 
 function Th({ children }) {
   return (
@@ -25,90 +21,131 @@ function Th({ children }) {
 
 function BookingList() {
   const [opened, { toggle, close }] = useDisclosure(false);
-  const data = bookings;
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [dataToCancel, setDataToCancel] = useState([]);
+  const { sendRequest } = useFetch();
+  const { successToast, errorToast } = useToast();
 
-  const handleSubmit = () => {
-    close();
-    notifications.show({
-      title: "Table canceled!",
-      message: "You will receive a confirmation email shortly",
-      autoClose: 5000,
-    });
+  useEffect(() => {
+    getList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getList = async () => {
+    const resData = await sendRequest(
+      `${import.meta.env.VITE_API_URL}/booking`,
+      "GET"
+    );
+    setData(resData);
+    setLoading(false);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await sendRequest(
+        `${import.meta.env.VITE_API_URL}/booking/${dataToCancel._id}/delete`,
+        "DELETE"
+      );
+      setData((prev) =>
+        prev.filter((booking) => booking._id !== dataToCancel._id)
+      );
+      close();
+      successToast({
+        title: "Table canceled!",
+        message: "You will receive a confirmation email shortly",
+      });
+    } catch (err) {
+      console.log(err);
+      close();
+      errorToast();
+    }
   };
 
   const rows = data.map((row) => (
-    <Table.Tr key={row.id}>
+    <Table.Tr key={row._id}>
       <Table.Td>
         <Anchor component={Link} to="/restaurant/1">
-          {row.restaurant}
+          {/* TODO */}
+          Wildfire Steakhouse
         </Anchor>
       </Table.Td>
-      <Table.Td>{row.date}</Table.Td>
-      <Table.Td>{row.time}</Table.Td>
+
+      <Table.Td>{dayjs(row.dateTime).format("DD/MM/YYYY")}</Table.Td>
+      <Table.Td>{dayjs(row.dateTime).format("hh:mmA")}</Table.Td>
       <Table.Td>{row.pax}</Table.Td>
       <Table.Td>{row.request}</Table.Td>
 
       <Table.Td w="85px">
-        <Button variant="outline" onClick={toggle}>
+        <Button
+          variant="outline"
+          onClick={() => {
+            toggle();
+            setDataToCancel(row);
+          }}
+        >
           Cancel
         </Button>
       </Table.Td>
       <Table.Td w="85px">
-        <Button component={Link} to="/booking/1/edit">
+        <Button component={Link} to={`/booking/${row._id}/edit`}>
           Edit
         </Button>
       </Table.Td>
     </Table.Tr>
   ));
 
+  const modalContent = (
+    <ul>
+      <li>Date: {dayjs(dataToCancel.dateTime).format("DD/MM/YYYY")}</li>
+      <li>Time: {dayjs(dataToCancel.dateTime).format("hh:mmA")}</li>
+      <li>Table for: {dataToCancel.pax}</li>
+      <li>
+        Special Request:
+        {dataToCancel.request ? dataToCancel.request : "None"}
+      </li>
+    </ul>
+  );
+
   return (
     <>
-      <ScrollArea>
-        <Table verticalSpacing="xs" miw={700}>
-          <Table.Tbody>
-            <Table.Tr>
-              <Th>Restaurant</Th>
-              <Th>Date</Th>
-              <Th>Time</Th>
-              <Th>Pax</Th>
-              <Th>Request</Th>
-            </Table.Tr>
-          </Table.Tbody>
-          <Table.Tbody>
-            {rows.length > 0 ? (
-              rows
-            ) : (
-              <Table.Tr>
-                <Table.Td colSpan={Object.keys(data[0]).length}>
-                  <Text fw={500} ta="center">
-                    Nothing found
-                  </Text>
-                </Table.Td>
-              </Table.Tr>
-            )}
-          </Table.Tbody>
-        </Table>
-      </ScrollArea>
+      {loading ? (
+        <LoadingSpinner />
+      ) : rows.length === 0 ? (
+        <Text fw={500} ta="center">
+          You have no bookings yet. <br />
+          <Anchor component={Link} to="/">
+            Book a table now!
+          </Anchor>
+        </Text>
+      ) : (
+        <>
+          <ScrollArea>
+            <Table verticalSpacing="xs" miw={700}>
+              <Table.Tbody>
+                <Table.Tr>
+                  <Th>Restaurant</Th>
+                  <Th>Date</Th>
+                  <Th>Time</Th>
+                  <Th>Pax</Th>
+                  <Th>Request</Th>
+                </Table.Tr>
+              </Table.Tbody>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          </ScrollArea>
 
-      {/* Modal */}
-      <Modal opened={opened} onClose={close} title="Cancel a table reservation">
-        <ul>
-          <li>Date: 04/01/2024</li>
-          <li>Time: 18:00</li>
-          <li>Table for: 3</li>
-          <li>Special Request: None</li>
-        </ul>
-
-        <Text mt="md">Are you sure you want to proceed?</Text>
-        <Group justify="center" mt="xl">
-          <Button type="button" variant="outline" onClick={toggle}>
-            Back
-          </Button>
-          <Button type="submit" onClick={handleSubmit}>
-            Proceed
-          </Button>
-        </Group>
-      </Modal>
+          {/* Modal */}
+          <Modal
+            opened={opened}
+            title="Cancel a table reservation"
+            modalContent={modalContent}
+            toggle={toggle}
+            close={close}
+            handleSubmit={handleSubmit}
+          />
+        </>
+      )}
     </>
   );
 }

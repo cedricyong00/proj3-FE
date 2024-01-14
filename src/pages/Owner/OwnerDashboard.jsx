@@ -4,17 +4,20 @@ import {
   Group,
   Text,
   Button,
-  Modal,
   ActionIcon,
   rem,
+  Anchor,
+  useMantineTheme,
 } from "@mantine/core";
 import PropTypes from "prop-types";
-import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { bookings } from "../../assets/sampleData/booking";
+import { useMediaQuery } from "@mantine/hooks";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconClock } from "@tabler/icons-react";
+import dayjs from "dayjs";
+import { Link } from "react-router-dom";
+import useFetch from "../../hooks/useFetch";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 
 function Th({ children }) {
   return (
@@ -27,28 +30,39 @@ function Th({ children }) {
 }
 
 function OwnerDashboard() {
-  const [opened, { toggle, close }] = useDisclosure(false);
-  const data = bookings;
   const [dateFrom, setDateFrom] = useState(new Date());
   const [dateTo, setDateTo] = useState(new Date());
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { sendRequest } = useFetch();
 
-  const handleSubmit = () => {
-    close();
-    notifications.show({
-      title: "Table canceled!",
-      message: "You will receive a confirmation email shortly",
-      autoClose: 5000,
-    });
+  const theme = useMantineTheme();
+  const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
+
+  useEffect(() => {
+    getList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getList = async () => {
+    const resData = await sendRequest(
+      `${import.meta.env.VITE_API_URL}/booking`,
+      "GET"
+    );
+    setData(resData);
+    setLoading(false);
   };
 
   const rows = data.map((row) => (
-    <Table.Tr key={row.id}>
-      <Table.Td>{row.name}</Table.Td>
-      <Table.Td>{row.date}</Table.Td>
-      <Table.Td>{row.time}</Table.Td>
+    <Table.Tr key={row._id}>
+      {/* TODO */}
+      <Table.Td>Natsumi Hori</Table.Td>
+      <Table.Td>{dayjs(row.dateTime).format("DD/MM/YYYY")}</Table.Td>
+      <Table.Td>{dayjs(row.dateTime).format("hh:mmA")}</Table.Td>
       <Table.Td>{row.pax}</Table.Td>
-      <Table.Td>{row.request}</Table.Td>
-      <Table.Td>{row.email}</Table.Td>
+      <Table.Td>{row.request ? row.request : "None"}</Table.Td>
+      {/* TODO */}
+      <Table.Td>email@email.cpm</Table.Td>
     </Table.Tr>
   ));
 
@@ -75,83 +89,73 @@ function OwnerDashboard() {
 
   return (
     <>
-      <Group align="flex-end">
-        <DatePickerInput
-          label="Date From"
-          placeholder="Pick date"
-          value={dateFrom}
-          onChange={setDateFrom}
-          miw="150px"
-        />
-        <DatePickerInput
-          label="Date To"
-          placeholder="Pick date"
-          value={dateTo}
-          onChange={setDateTo}
-          miw="150px"
-        />
-        <TimeInput
-          label="Time From"
-          ref={refFrom}
-          rightSection={pickerControlFrom}
-          miw="150px"
-        />
-        <TimeInput
-          label="Time To"
-          ref={refTo}
-          rightSection={pickerControlTo}
-          miw="150px"
-        />
-        <Button>Filter</Button>
-      </Group>
+      {loading ? (
+        <LoadingSpinner />
+      ) : rows.length === 0 ? (
+        <Text fw={500} ta="center">
+          You have no bookings yet. <br />
+          <Anchor component={Link} to="/">
+            Book a table now!
+          </Anchor>
+        </Text>
+      ) : (
+        <>
+          {/* TODO: Apply filter logic */}
+          <Group align="flex-end">
+            <DatePickerInput
+              label="Date From"
+              placeholder="Pick date"
+              value={dateFrom}
+              onChange={setDateFrom}
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
+            />
+            <DatePickerInput
+              label="Date To"
+              placeholder="Pick date"
+              value={dateTo}
+              onChange={setDateTo}
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
+            />
+            <TimeInput
+              label="Time From"
+              ref={refFrom}
+              rightSection={pickerControlFrom}
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
+            />
+            <TimeInput
+              label="Time To"
+              ref={refTo}
+              rightSection={pickerControlTo}
+              miw={!isPc ? "calc(50% - 12px)" : "150px"}
+            />
+            <Button>Filter</Button>
+          </Group>
 
-      <ScrollArea mt="xl">
-        <Table verticalSpacing="md" miw={700}>
-          <Table.Tbody>
-            <Table.Tr>
-              <Th>Name</Th>
-              <Th>Date</Th>
-              <Th>Time</Th>
-              <Th>Pax</Th>
-              <Th>Request</Th>
-              <Th>Email</Th>
-            </Table.Tr>
-          </Table.Tbody>
-          <Table.Tbody>
-            {rows.length > 0 ? (
-              rows
-            ) : (
-              <Table.Tr>
-                <Table.Td colSpan={Object.keys(data[0]).length}>
+          <ScrollArea mt="xl">
+            <Table verticalSpacing="md" miw={700}>
+              <Table.Tbody>
+                <Table.Tr>
+                  <Th>Name</Th>
+                  <Th>Date</Th>
+                  <Th>Time</Th>
+                  <Th>Pax</Th>
+                  <Th>Request</Th>
+                  <Th>Email</Th>
+                </Table.Tr>
+              </Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
                   <Text fw={500} ta="center">
                     Nothing found
                   </Text>
-                </Table.Td>
-              </Table.Tr>
-            )}
-          </Table.Tbody>
-        </Table>
-      </ScrollArea>
-
-      {/* Modal */}
-      <Modal opened={opened} onClose={close} title="Cancel a table reservation">
-        <ul>
-          <li>Date: 04/01/2024</li>
-          <li>Time: 18:00</li>
-          <li>Table for: 3</li>
-          <li>Special Request: None</li>
-        </ul>
-
-        <Text mt="md">Are you sure you want to proceed?</Text>
-        <Group justify="center" mt="xl">
-          <Button type="button" variant="outline" onClick={toggle}>
-            Back
-          </Button>
-          <Button type="submit" onClick={handleSubmit}>
-            Proceed
-          </Button>
-        </Group>
-      </Modal>
+                )}
+              </Table.Tbody>
+            </Table>
+          </ScrollArea>
+        </>
+      )}
     </>
   );
 }
