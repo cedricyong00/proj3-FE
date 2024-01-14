@@ -21,7 +21,6 @@ const [userEmail, setUserEmail] = useState("");
 const [isOwner, setIsOwner] = useState(false);
 
 //Handle change in form fields
-const [email, setEmail] = useState("");
 const [password, setPassword] = useState("");
 
 //Function to handle submit events
