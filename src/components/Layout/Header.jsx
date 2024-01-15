@@ -23,7 +23,7 @@ import {
 } from "@tabler/icons-react";
 import classes from "./HeaderTabs.module.css";
 import { Link } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logo-new.png";
 
 const dummyUser = {
   name: "John Doe",
@@ -52,7 +52,7 @@ export const Header = () => {
             <Anchor component={Link} to="/" underline="never">
               <Flex justify="space-between" direction="row" align="center">
                 <Image src={logo} w={30} h={30} />
-                <Text>ChopeSeats</Text>
+                <Text ml="xs" fw="bold">ChopeSeats</Text>
               </Flex>
             </Anchor>
           </Title>
