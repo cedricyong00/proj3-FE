@@ -29,6 +29,7 @@ function EditBooking() {
   const { sendRequest } = useFetch();
   const ref = useRef(null);
   const { successToast, errorToast } = useToast();
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     getSingleBooking();
@@ -36,27 +37,29 @@ function EditBooking() {
   }, []);
 
   const getSingleBooking = async () => {
-    const data = await sendRequest(
+    const resData = await sendRequest(
       `${import.meta.env.VITE_API_URL}/booking/${pathId}`,
       "GET"
     );
     setLoading(false);
+    setData(resData.booking);
     form.setValues({
-      pax: data.booking.pax,
-      date: new Date(data.booking.dateTime),
-      time: dayjs(data.booking.dateTime).utc().local().format("HH:mm"),
-      request: data.booking.request,
+      pax: resData.booking.pax,
+      date: new Date(resData.booking.dateTime),
+      time: dayjs(resData.booking.dateTime).utc().local().format("HH:mm"),
+      request: resData.booking.request,
     });
   };
 
   const form = useForm({
     validate: {
       pax: (value) =>
-        value === undefined ? "Please enter a number" : value < 1,
-      // TODO: Fetch restaurant data from API
-      // ? "Minimum 1 pax"
-      // : value > restaurantData.maxPax
-      // ? "Maximum " + restaurantData.maxPax + " pax"
+        value === undefined
+          ? "Please enter a number"
+          : value < 1 && "Minimum 1 pax",
+      // TODO
+      // : value > data.maxPax
+      // ? "Maximum " + data.maxPax + " pax"
       // : value > 10 &&
       //   "For large group, please contact the restaurant directly",
       date: (value) =>
@@ -75,7 +78,7 @@ function EditBooking() {
   const handleSubmit = async () => {
     try {
       await sendRequest(
-        `${import.meta.env.VITE_API_URL}/booking/${pathId}/edit/`,
+        `${import.meta.env.VITE_API_URL}/booking/${data._id}/edit/`,
         "PUT",
         {
           // TODO add time
@@ -127,7 +130,8 @@ function EditBooking() {
         <>
           <Title order={2} ta="center">
             {/* TODO */}
-            Reserve a table at Wildfire Steakhouse
+            {/* Reserve a table at {data.restaurant.name} */}
+            Edit a Table Reservation at Restaurant Name
           </Title>
           <Box maw={340} mx="auto" mt="xl">
             <form

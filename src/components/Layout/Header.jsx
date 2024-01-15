@@ -52,7 +52,7 @@ export const Header = () => {
             <Anchor component={Link} to="/" underline="never">
               <Flex justify="space-between" direction="row" align="center">
                 <Image src={logo} w={30} h={30} />
-                <Text>Brand Name</Text>
+                <Text>ChopeSeats</Text>
               </Flex>
             </Anchor>
           </Title>

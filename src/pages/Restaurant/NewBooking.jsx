@@ -12,26 +12,41 @@ import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { restaurants } from "../../assets/sampleData/restaurant";
 import { useDisclosure } from "@mantine/hooks";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 
 function NewBooking() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [opened, { toggle, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const { sendRequest } = useFetch();
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
-  const pathIdNum = parseInt(pathId);
   const { successToast, errorToast } = useToast();
 
-  const restaurantData = restaurants.find(
-    (restaurant) => restaurant.id === pathIdNum
-  );
+  useEffect(() => {
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const getData = async () => {
+    try {
+      const resData = await sendRequest(
+        `${import.meta.env.VITE_API_URL}/restaurant/${pathId}`,
+        "GET"
+      );
+      setData(resData);
+    } catch (err) {
+      console.log(err);
+    }
+    setLoading(false);
+  };
 
   const form = useForm({
     validate: {
@@ -40,8 +55,8 @@ function NewBooking() {
           ? "Please enter a number"
           : value < 1
           ? "Minimum 1 pax"
-          : value > restaurantData.maxPax
-          ? "Maximum " + restaurantData.maxPax + " pax"
+          : value > data.maxPax
+          ? "Maximum " + data.maxPax + " pax"
           : value > 10 &&
             "For large group, please contact the restaurant directly",
       date: (value) =>
@@ -66,6 +81,7 @@ function NewBooking() {
           dateTime: form.values.date,
           pax: form.values.pax,
           request: form.values.request,
+          restaurantId: data._id,
         }
       );
       console.log(res);
@@ -108,73 +124,79 @@ function NewBooking() {
 
   return (
     <>
-      <Title order={2} ta="center">
-        Reserve a table at {restaurantData.name}
-      </Title>
-      <Box maw={340} mx="auto" mt="xl">
-        <form
-          onSubmit={form.onSubmit(() => {
-            if (form.isValid) {
-              toggle();
-            }
-          })}
-        >
-          <DateInput
-            mt="md"
-            valueFormat="DD/MM/YYYY"
-            label="Date"
-            placeholder="01/03/2024"
-            {...form.getInputProps("date")}
-          />
-
-          <TimeInput
-            label="Time"
-            mt="md"
-            ref={ref}
-            rightSection={pickerControl}
-            {...form.getInputProps("time")}
-          />
-
-          <NumberInput
-            label="Number of Pax"
-            placeholder="2"
-            min={1}
-            mt="md"
-            {...form.getInputProps("pax")}
-          />
-
-          <Textarea
-            label="Special Request (If any)"
-            mt="md"
-            placeholder="Child sheet, wheelchair, etc."
-            autosize="true"
-            minRows={3}
-            {...form.getInputProps("request")}
-          />
-
-          <Group justify="center" mt="xl">
-            <Button
-              type="button"
-              component={Link}
-              to={`/restaurant/${pathIdNum}`}
-              variant="outline"
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <Title order={2} ta="center">
+            Reserve a table at {data.name}
+          </Title>
+          <Box maw={340} mx="auto" mt="xl">
+            <form
+              onSubmit={form.onSubmit(() => {
+                if (form.isValid) {
+                  toggle();
+                }
+              })}
             >
-              Cancel
-            </Button>
-            <Button type="submit">Submit</Button>
-          </Group>
-        </form>
+              <DateInput
+                mt="md"
+                valueFormat="DD/MM/YYYY"
+                label="Date"
+                placeholder="01/03/2024"
+                {...form.getInputProps("date")}
+              />
 
-        {/* Modal */}
-        <Modal
-          opened={opened}
-          title="Reserve a Table"
-          modalContent={modalContent}
-          toggle={toggle}
-          close={close}
-          handleSubmit={handleSubmit}
-        />
-      </Box>
+              <TimeInput
+                label="Time"
+                mt="md"
+                ref={ref}
+                rightSection={pickerControl}
+                {...form.getInputProps("time")}
+              />
+
+              <NumberInput
+                label="Number of Pax"
+                placeholder="2"
+                min={1}
+                mt="md"
+                {...form.getInputProps("pax")}
+              />
+
+              <Textarea
+                label="Special Request (If any)"
+                mt="md"
+                placeholder="Child sheet, wheelchair, etc."
+                autosize="true"
+                minRows={3}
+                {...form.getInputProps("request")}
+              />
+
+              <Group justify="center" mt="xl">
+                <Button
+                  type="button"
+                  component={Link}
+                  to={`/restaurant/${pathId}`}
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Submit</Button>
+              </Group>
+            </form>
+
+            {/* Modal */}
+            <Modal
+              opened={opened}
+              title="Reserve a Table"
+              modalContent={modalContent}
+              toggle={toggle}
+              close={close}
+              handleSubmit={handleSubmit}
+            />
+          </Box>
+        </>
+      )}
     </>
   );
 }
