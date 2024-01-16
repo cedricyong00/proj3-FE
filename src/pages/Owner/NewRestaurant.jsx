@@ -1,26 +1,30 @@
 import {
+  ActionIcon,
   TextInput,
-  MultiSelect,
+  Select,
   NumberInput,
   Textarea,
   Box,
   Title,
+  rem,
+  Group,
+  Button,
 } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { restaurants } from "../../assets/sampleData/restaurant";
 import { useDisclosure } from "@mantine/hooks";
 import { useRef } from "react";
-import dayjs from "dayjs";
+// import { DatesProvider } from '@mantine/dates';
+// import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
 
 function NewRestaurant() {
   const [opened, { toggle, close }] = useDisclosure(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { sendRequest } = useFetch();
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
@@ -29,14 +33,14 @@ function NewRestaurant() {
 
   const form = useForm({
     validate: {
-      category: (value) =>
-        value === undefined &&
-        "Please choose a category which best represents your restaurant cuisine",
-      location: (value) =>
-        value === undefined &&
-        "Please choose an area which best represents your restaurant's location",
-      address: (value) =>
-        value === undefined && "Please provide your restaurant address",
+      // category: (value) =>
+      //   value === undefined &&
+      //   "Please choose a category which best represents your restaurant cuisine",
+      // location: (value) =>
+      //   value === undefined &&
+      //   "Please choose an area which best represents your restaurant's location",
+      // address: (value) =>
+      //   value === undefined && "Please provide your restaurant address",
       phone: (value) =>
         value &&
         /^[1-9]\d{7}$/.test(value) &&
@@ -44,22 +48,32 @@ function NewRestaurant() {
       maxPax: (value) =>
         value === undefined &&
         "Please enter a number for the max no. of people your restaurant can accept for bookings",
-      timeOpen: (value) => value === undefined && "Please enter a time",
-      timeClose: (value) =>
-        value === undefined
-          ? "Please enter a time"
-          : value < timeOpen && "Closing time must be later than opening time.",
+      // timeOpen: (value) => value === undefined && "Please enter a time",
+      // timeClose: (value) =>
+      //   value === undefined
+      //     ? "Please enter a time"
+      //     : value < timeOpen && "Closing time must be later than opening time.",
       description: (value) =>
         value?.length > 500 && "Please enter less than 500 characters",
     },
+
+    transformValues: (values) => ({
+      timeOpen: (value) => {
+        const [hour, min] = value.split(":");
+        return parseInt(hour + min, 10);
+      },
+      timeClose: (value) => {
+        const [hour, min] = value.split(":");
+        return parseInt(hour + min, 10);
+      },
+    }),
   });
 
   const handleSubmit = async () => {
     console.log(form.values);
-
     try {
       const res = await sendRequest(
-        `${import.meta.env.VITE_API_URL}/restaurant/create`,
+        `${import.meta.env.VITE_API_URL}restaurant/create`,
         "POST",
         {
           // add user info in req body
@@ -67,8 +81,8 @@ function NewRestaurant() {
           image: form.values.image,
           category: form.values.category,
           location: form.values.location,
-          timeOpen: form.values.timeOpen,
-          timeClose: form.values.timeClose,
+          timeOpen: form.getTransformedValues.timeOpen,
+          timeClose: form.getTransformedValues.timeClose,
           address: form.values.address,
           phone: form.values.phone,
           websiteUrl: form.values.websiteUrl,
@@ -76,9 +90,9 @@ function NewRestaurant() {
           description: form.values.description,
         }
       );
-      console.log(res);
-      navigate("/restaurant/:restid");
-      close();
+      // console.log(res);
+      // navigate("/restaurant/:restid");
+      // close();
       successToast({
         title: "Restaurant Info Successfully Created!",
         message: "Your restaurant is now listed and available for reservations",
@@ -102,16 +116,19 @@ function NewRestaurant() {
     </ActionIcon>
   );
 
-  // const modalContent = (
-  //   <ul>
-  //     <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-  //     {/* TOTO change format to hh:mm A */}
-  //     <li>Time: {form.values.time}</li>
-  //     <li>
-  //       Description: {form.values.description ? form.values.request : "None"}
-  //     </li>
-  //   </ul>
-  // );
+  const modalContent = (
+    <ul>
+      <li> test</li>
+      {/* <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
+      // TOTO change format to hh:mm A 
+      <li>Time: {form.values.time}</li>
+      {" "}
+      <li>
+       Description: {form.values.description ? form.values.request : "None"}
+        {" "}
+      </li> */}
+    </ul>
+  );
 
   return (
     <>
@@ -127,18 +144,16 @@ function NewRestaurant() {
           })}
         >
           <TextInput label="Name" withAsterisk placeholder="Placeholder text" />
-          <MultiSelect
+          <Select
             label="Location"
             withAsterisk
-            error="Plcaeholder text"
-            placeholder="MultiSelect placeholder"
+            placeholder="Pick value"
             data={["North", "South", "East", "West", "Central"]}
           />
-          <MultiSelect
+          <Select
             label="Category"
             withAsterisk
-            error="Placeholder text"
-            placeholder="MultiSelect placeholder"
+            placeholder="Pick the one that best represents the cuisines your restaurant serves"
             data={["Asian", "Chinese", "Japanese", "Western"]}
           />
           <TextInput
@@ -149,7 +164,7 @@ function NewRestaurant() {
           <TextInput label="Phone" placeholder="pls exclude +65 country code" />
           <TextInput
             label="Website URL"
-            placeholder="pls enter the URL to your resturant"
+            placeholder="Placeholder text"
             {...form.getInputProps("websiteUrl")}
           />
           <NumberInput
@@ -183,7 +198,6 @@ function NewRestaurant() {
           />
           <TextInput
             label="Image"
-            withAsterisk
             placeholder="Pls enter a URL for your restaurant logo/image"
           />
 
@@ -191,7 +205,7 @@ function NewRestaurant() {
             <Button
               type="button"
               component={Link}
-              to={`/restaurant/${pathIdNum}`}
+              to={`/owner/bookings`}
               variant="outline"
             >
               Cancel
