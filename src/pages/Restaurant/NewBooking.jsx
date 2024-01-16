@@ -89,7 +89,7 @@ function NewBooking() {
 
     try {
       await sendRequest(
-        `${import.meta.env.VITE_API_URL}/booking/createe`,
+        `${import.meta.env.VITE_API_URL}/booking/create`,
         "POST",
         {
           dateTime: formattedDateTime,
