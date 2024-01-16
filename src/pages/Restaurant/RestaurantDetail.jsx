@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 
+// Temporary code for fetching data. Feel free to discard.
+
 function RestaurantDetail() {
   const { sendRequest } = useFetch();
   const [data, setData] = useState([]);

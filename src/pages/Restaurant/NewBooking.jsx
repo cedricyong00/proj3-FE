@@ -19,6 +19,7 @@ import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 function NewBooking() {
   const [data, setData] = useState([]);
@@ -29,6 +30,8 @@ function NewBooking() {
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
   const { successToast, errorToast } = useToast();
+  const ref = useRef(null);
+  dayjs.extend(customParseFormat);
 
   useEffect(() => {
     getData();
@@ -49,6 +52,11 @@ function NewBooking() {
   };
 
   const form = useForm({
+    initialValues: {
+      time: "",
+      // TODO: get next date of today as default
+      date: new Date(),
+    },
     validate: {
       pax: (value) =>
         value === undefined
@@ -62,29 +70,34 @@ function NewBooking() {
       date: (value) =>
         value === undefined
           ? "Please enter a date"
-          : value < new Date() && "Date must be in the future",
-      time: (value) => value === undefined && "Please enter a time",
+          : value < new Date()
+          ? "Date must be in the future"
+          : value > new Date().setDate(new Date().getDate() + 14) &&
+            "Date must be within 14 days",
+      time: (value) => value === "" && "Please enter a time",
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
 
   const handleSubmit = async () => {
-    console.log(form.values);
+    const timeToAdd = form.values.time;
+    const newDateTime = dayjs(form.values.date)
+      .hour(parseInt(timeToAdd.split(":")[0]))
+      .minute(parseInt(timeToAdd.split(":")[1]));
+    const formattedDateTime = newDateTime.format();
 
     try {
-      const res = await sendRequest(
-        `${import.meta.env.VITE_API_URL}/booking/create`,
+      await sendRequest(
+        `${import.meta.env.VITE_API_URL}/booking/createe`,
         "POST",
         {
-          // TODO: add time
-          dateTime: form.values.date,
+          dateTime: formattedDateTime,
           pax: form.values.pax,
           request: form.values.request,
-          restaurantId: data._id,
+          restaurant: data._id,
         }
       );
-      console.log(res);
       navigate("/account/bookings");
       close();
       successToast({
@@ -97,8 +110,6 @@ function NewBooking() {
       errorToast();
     }
   };
-
-  const ref = useRef(null);
 
   const pickerControl = (
     <ActionIcon
@@ -113,8 +124,7 @@ function NewBooking() {
   const modalContent = (
     <ul>
       <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-      {/* TOTO change format to hh:mm A */}
-      <li>Time: {form.values.time}</li>
+      <li>Time: {dayjs(form.values.time, "HH:mm").format("hh:mm A")}</li>
       <li>Table for: {form.values.pax}</li>
       <li>
         Special Request: {form.values.request ? form.values.request : "None"}

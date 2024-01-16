@@ -19,6 +19,7 @@ import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import useToast from "../../hooks/useToast";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 
 function EditBooking() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ function EditBooking() {
   const ref = useRef(null);
   const { successToast, errorToast } = useToast();
   const [data, setData] = useState([]);
+  dayjs.extend(customParseFormat);
 
   useEffect(() => {
     getSingleBooking();
@@ -42,12 +44,12 @@ function EditBooking() {
       "GET"
     );
     setLoading(false);
-    setData(resData.booking);
+    setData(resData);
     form.setValues({
-      pax: resData.booking.pax,
-      date: new Date(resData.booking.dateTime),
-      time: dayjs(resData.booking.dateTime).utc().local().format("HH:mm"),
-      request: resData.booking.request,
+      pax: resData.pax,
+      date: new Date(resData.dateTime),
+      time: dayjs(resData.dateTime).utc().local().format("HH:mm"),
+      request: resData.request,
     });
   };
 
@@ -56,33 +58,38 @@ function EditBooking() {
       pax: (value) =>
         value === undefined
           ? "Please enter a number"
-          : value < 1 && "Minimum 1 pax",
-      // TODO
-      // : value > data.maxPax
-      // ? "Maximum " + data.maxPax + " pax"
-      // : value > 10 &&
-      //   "For large group, please contact the restaurant directly",
+          : value < 1
+          ? "Minimum 1 pax"
+          : value > data.restaurant.maxPax
+          ? "Maximum " + data.restaurant.maxPax + " pax"
+          : value > 10 &&
+            "For large group, please contact the restaurant directly",
       date: (value) =>
         value === undefined
           ? "Please enter a date"
-          : value < new Date() && "Date must be in the future",
-      time: (value) =>
-        value === undefined
-          ? "Please enter a time"
-          : value < new Date() && "Time must be in the future",
+          : value < new Date()
+          ? "Date must be in the future"
+          : value > new Date().setDate(new Date().getDate() + 14) &&
+            "Date must be within 14 days",
+      time: (value) => value === "" && "Please enter a time",
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
 
   const handleSubmit = async () => {
+    const timeToAdd = form.values.time;
+    const newDateTime = dayjs(form.values.date)
+      .hour(parseInt(timeToAdd.split(":")[0]))
+      .minute(parseInt(timeToAdd.split(":")[1]));
+    const formattedDateTime = newDateTime.format();
+
     try {
       await sendRequest(
-        `${import.meta.env.VITE_API_URL}/booking/${data._id}/edit/`,
-        "PUT",
+        `${import.meta.env.VITE_API_URL}/booking/${data._id}`,
+        "POST",
         {
-          // TODO add time
-          dateTime: form.values.date,
+          dateTime: formattedDateTime,
           pax: form.values.pax,
           request: form.values.request,
         }
@@ -113,8 +120,7 @@ function EditBooking() {
   const modalContent = (
     <ul>
       <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-      {/* TODO */}
-      <li>Time: {form.values.time}</li>
+      <li>Time: {dayjs(form.values.time, "HH:mm").format("hh:mm A")}</li>
       <li>Table for: {form.values.pax}</li>
       <li>
         Special Request: {form.values.request ? form.values.request : "None"}
@@ -160,7 +166,6 @@ function EditBooking() {
               <NumberInput
                 label="Number of Pax"
                 placeholder="2"
-                min={1}
                 mt="md"
                 {...form.getInputProps("pax")}
               />
