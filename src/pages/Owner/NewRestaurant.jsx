@@ -9,6 +9,7 @@ import {
   rem,
   Group,
   Button,
+  MultiSelect,
 } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
@@ -33,66 +34,62 @@ function NewRestaurant() {
 
   const form = useForm({
     validate: {
-      // category: (value) =>
-      //   value === undefined &&
-      //   "Please choose a category which best represents your restaurant cuisine",
-      // location: (value) =>
-      //   value === undefined &&
-      //   "Please choose an area which best represents your restaurant's location",
-      // address: (value) =>
-      //   value === undefined && "Please provide your restaurant address",
-      phone: (value) =>
-        value &&
-        /^[1-9]\d{7}$/.test(value) &&
-        "Please enter a valid 8-digit number for Phone",
+      category: (value) =>
+        value === undefined &&
+        "Please choose a category which best represents your restaurant cuisine",
+      location: (value) =>
+        value === undefined &&
+        "Please choose an area which best represents your restaurant's location",
+      address: (value) =>
+        value === undefined && "Please provide your restaurant address",
+      // phone: (value) =>
+      //   value &&
+      //   /^[1-9]\d{7}$/.test(value) &&
+      //   "Please enter a valid 8-digit number for Phone",
       maxPax: (value) =>
         value === undefined &&
         "Please enter a number for the max no. of people your restaurant can accept for bookings",
-      // timeOpen: (value) => value === undefined && "Please enter a time",
-      // timeClose: (value) =>
-      //   value === undefined
-      //     ? "Please enter a time"
-      //     : value < timeOpen && "Closing time must be later than opening time.",
+      timeOpen: (value) => value === undefined && "Please enter a time",
+      timeClose: (value, values) =>
+        value === undefined
+          ? "Please enter a time"
+          : value < values.timeOpen &&
+            "Closing time must be later than opening time.",
       description: (value) =>
         value?.length > 500 && "Please enter less than 500 characters",
     },
-
-    transformValues: (values) => ({
-      timeOpen: (value) => {
-        const [hour, min] = value.split(":");
-        return parseInt(hour + min, 10);
-      },
-      timeClose: (value) => {
-        const [hour, min] = value.split(":");
-        return parseInt(hour + min, 10);
-      },
-    }),
   });
 
   const handleSubmit = async () => {
     console.log(form.values);
+
+    const pyl = {
+      // add user info in req body
+      name: form.values.name,
+      image: form.values.image,
+      category: form.values.category,
+      location: form.values.location,
+      timeOpen: parseInt(form.values.timeOpen.split(":").join("")),
+      timeClose: parseInt(form.values.timeClose.split(":").join("")),
+      address: form.values.address,
+      daysClose: form.values.daysClose,
+      phone: form.values.phone,
+      websiteUrl: form.values.websiteUrl,
+      maxPax: form.values.maxPax,
+      description: form.values.description,
+    };
+
+    console.log(pyl);
+
     try {
       const res = await sendRequest(
         `${import.meta.env.VITE_API_URL}restaurant/create`,
         "POST",
-        {
-          // add user info in req body
-          name: form.values.name,
-          image: form.values.image,
-          category: form.values.category,
-          location: form.values.location,
-          timeOpen: form.getTransformedValues.timeOpen,
-          timeClose: form.getTransformedValues.timeClose,
-          address: form.values.address,
-          phone: form.values.phone,
-          websiteUrl: form.values.websiteUrl,
-          maxPax: form.values.maxPax,
-          description: form.values.description,
-        }
+        pyl
       );
-      // console.log(res);
+      console.log(res);
       // navigate("/restaurant/:restid");
-      // close();
+      close();
       successToast({
         title: "Restaurant Info Successfully Created!",
         message: "Your restaurant is now listed and available for reservations",
@@ -143,25 +140,38 @@ function NewRestaurant() {
             }
           })}
         >
-          <TextInput label="Name" withAsterisk placeholder="Placeholder text" />
+          <TextInput
+            label="Name"
+            withAsterisk
+            placeholder="Placeholder text"
+            {...form.getInputProps("name")}
+          />
           <Select
             label="Location"
             withAsterisk
             placeholder="Pick value"
             data={["North", "South", "East", "West", "Central"]}
+            {...form.getInputProps("location")}
           />
           <Select
             label="Category"
             withAsterisk
             placeholder="Pick the one that best represents the cuisines your restaurant serves"
             data={["Asian", "Chinese", "Japanese", "Western"]}
+            {...form.getInputProps("category")}
           />
           <TextInput
             label="Address"
             withAsterisk
             placeholder="Placeholder text"
+            {...form.getInputProps("address")}
           />
-          <TextInput label="Phone" placeholder="pls exclude +65 country code" />
+          <TextInput
+            label="Phone"
+            type="number"
+            placeholder="pls exclude +65 country code"
+            {...form.getInputProps("phone")}
+          />
           <TextInput
             label="Website URL"
             placeholder="Placeholder text"
@@ -188,17 +198,33 @@ function NewRestaurant() {
             rightSection={pickerControl}
             {...form.getInputProps("timeClose")}
           />
+          <MultiSelect
+            label="Days Close"
+            placeholder="pls indicate the days your shop is closed."
+            data={[
+              "Sunday",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+            ]}
+            clearable
+            searchable
+            {...form.getInputProps("daysClose")}
+          />
           <Textarea
             label="Description"
             mt="md"
             placeholder="Placeholder text"
             autosize="true"
             minRows={3}
-            {...form.getInputProps("request")}
+            {...form.getInputProps("description")}
           />
           <TextInput
             label="Image"
             placeholder="Pls enter a URL for your restaurant logo/image"
+            {...form.getInputProps("image")}
           />
 
           <Group justify="center" mt="xl">
