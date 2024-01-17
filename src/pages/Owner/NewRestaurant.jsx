@@ -14,7 +14,7 @@ import {
 import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { useRef } from "react";
 // import { DatesProvider } from '@mantine/dates';
@@ -25,11 +25,8 @@ import useToast from "../../hooks/useToast";
 
 function NewRestaurant() {
   const [opened, { toggle, close }] = useDisclosure(false);
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
   const { sendRequest } = useFetch();
-  const location = useLocation();
-  const pathId = location.pathname.split("/")[2];
-  const pathIdNum = parseInt(pathId);
   const { successToast, errorToast } = useToast();
 
   const form = useForm({
@@ -83,12 +80,12 @@ function NewRestaurant() {
 
     try {
       const res = await sendRequest(
-        `${import.meta.env.VITE_API_URL}restaurant/create`,
+        `${import.meta.env.VITE_API_URL}/restaurant/create`,
         "POST",
         pyl
       );
       console.log(res);
-      // navigate("/restaurant/:restid");
+      navigate("/owner/restaurant");
       close();
       successToast({
         title: "Restaurant Info Successfully Created!",
@@ -101,13 +98,23 @@ function NewRestaurant() {
     }
   };
 
-  const ref = useRef(null);
+  const refOpen = useRef(null);
+  const refClose = useRef(null);
 
-  const pickerControl = (
+  const pickerControlOpen = (
     <ActionIcon
       variant="subtle"
       color="gray"
-      onClick={() => ref.current?.showPicker()}
+      onClick={() => refOpen.current?.showPicker()}
+    >
+      <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+    </ActionIcon>
+  );
+  const pickerControlClose = (
+    <ActionIcon
+      variant="subtle"
+      color="gray"
+      onClick={() => refClose.current?.showPicker()}
     >
       <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
     </ActionIcon>
@@ -117,7 +124,7 @@ function NewRestaurant() {
     <ul>
       <li> test</li>
       {/* <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-      // TOTO change format to hh:mm A 
+      // TOTO change format to hh:mm A
       <li>Time: {form.values.time}</li>
       {" "}
       <li>
@@ -143,64 +150,71 @@ function NewRestaurant() {
           <TextInput
             label="Name"
             withAsterisk
-            placeholder="Placeholder text"
+            placeholder="GA Cafe"
             {...form.getInputProps("name")}
           />
           <Select
             label="Location"
             withAsterisk
-            placeholder="Pick value"
+            placeholder="Pick one"
             data={["North", "South", "East", "West", "Central"]}
+            mt="md"
             {...form.getInputProps("location")}
           />
           <Select
             label="Category"
             withAsterisk
-            placeholder="Pick the one that best represents the cuisines your restaurant serves"
+            placeholder="Pick one"
             data={["Asian", "Chinese", "Japanese", "Western"]}
+            mt="md"
             {...form.getInputProps("category")}
           />
           <TextInput
             label="Address"
             withAsterisk
-            placeholder="Placeholder text"
+            placeholder="79 Anson Rd, Level 20, Singapore 079906"
+            mt="md"
             {...form.getInputProps("address")}
           />
           <TextInput
             label="Phone"
             type="number"
-            placeholder="pls exclude +65 country code"
+            placeholder="0123 4567 (Exclude +65 country code)"
+            mt="md"
             {...form.getInputProps("phone")}
           />
           <TextInput
             label="Website URL"
-            placeholder="Placeholder text"
+            placeholder="https://gacafe.com"
+            mt="md"
             {...form.getInputProps("websiteUrl")}
           />
           <NumberInput
             label="Maximum Pax"
-            placeholder="pls indicate the max no. of pax your restaurant will accept for bookings"
+            placeholder="10"
             min={1}
             mt="md"
             {...form.getInputProps("maxPax")}
           />
           <TimeInput
             label="Opening Time"
+            withAsterisk
             mt="md"
-            ref={ref}
-            rightSection={pickerControl}
+            ref={refOpen}
+            rightSection={pickerControlOpen}
             {...form.getInputProps("timeOpen")}
           />
           <TimeInput
             label="Closing Time"
+            withAsterisk
             mt="md"
-            ref={ref}
-            rightSection={pickerControl}
+            ref={refClose}
+            rightSection={pickerControlClose}
             {...form.getInputProps("timeClose")}
           />
           <MultiSelect
             label="Days Close"
-            placeholder="pls indicate the days your shop is closed."
+            placeholder="Pick one or more"
             data={[
               "Sunday",
               "Monday",
@@ -208,22 +222,25 @@ function NewRestaurant() {
               "Wednesday",
               "Thursday",
               "Friday",
+              "Saturday",
             ]}
             clearable
             searchable
+            mt="md"
             {...form.getInputProps("daysClose")}
           />
           <Textarea
             label="Description"
             mt="md"
-            placeholder="Placeholder text"
+            placeholder="A cozy cafe offering a wide range of coffee, tea, and pastries."
             autosize="true"
             minRows={3}
             {...form.getInputProps("description")}
           />
           <TextInput
             label="Image"
-            placeholder="Pls enter a URL for your restaurant logo/image"
+            mt="md"
+            placeholder="https://gacafe.com/image.jpg"
             {...form.getInputProps("image")}
           />
 
@@ -231,7 +248,7 @@ function NewRestaurant() {
             <Button
               type="button"
               component={Link}
-              to={`/owner/bookings`}
+              to={`/owner/restaurant`}
               variant="outline"
             >
               Cancel
