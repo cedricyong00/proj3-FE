@@ -59,6 +59,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             {/* Booking */}
             <Route path="/booking/:id/edit" element={<EditBooking />} />
 
+            {/* Owner */}
             <Route path="/owner/bookings" element={<OwnerDashboard />} />
             <Route path="/owner/restaurant" element={<RestaurantInfo />} />
             <Route path="/owner/restaurant/new" element={<NewRestaurant />} />

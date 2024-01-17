@@ -20,6 +20,7 @@ import useFetch from "../../hooks/useFetch";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import useToast from "../../hooks/useToast";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import useCheckDaysOfWeek from "../../hooks/useCheckDaysOfWeek";
 
 function EditBooking() {
   const navigate = useNavigate();
@@ -32,6 +33,8 @@ function EditBooking() {
   const { successToast, errorToast } = useToast();
   const [data, setData] = useState([]);
   dayjs.extend(customParseFormat);
+  const { isInputDayClosed } = useCheckDaysOfWeek();
+  const [isDayClosed, setIsDayClosed] = useState(false);
 
   useEffect(() => {
     getSingleBooking();
@@ -69,13 +72,22 @@ function EditBooking() {
           ? "Please enter a date"
           : value < new Date()
           ? "Date must be in the future"
-          : value > new Date().setDate(new Date().getDate() + 14) &&
-            "Date must be within 14 days",
+          : value > new Date().setDate(new Date().getDate() + 14)
+          ? "Date must be within 14 days"
+          : isDayClosed && "Restaurant is closed on this day",
       time: (value) => value === "" && "Please enter a time",
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
+
+  useEffect(() => {
+    if (data?.restaurant?.daysClose) {
+      setIsDayClosed(
+        isInputDayClosed(data?.restaurant?.daysClose, form.values.date)
+      );
+    }
+  }, [data?.restaurant?.daysClose, form.values.date, isInputDayClosed]);
 
   const handleSubmit = async () => {
     const timeToAdd = form.values.time;
@@ -135,9 +147,7 @@ function EditBooking() {
       ) : (
         <>
           <Title order={2} ta="center">
-            {/* TODO */}
-            {/* Reserve a table at {data.restaurant.name} */}
-            Edit a Table Reservation at Restaurant Name
+            Reserve a table at {data.restaurant.name}
           </Title>
           <Box maw={340} mx="auto" mt="xl">
             <form

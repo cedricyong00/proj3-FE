@@ -37,16 +37,31 @@ function OwnerDashboard() {
   const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
 
   const form = useForm({
-    // TODO
     initialValues: {
-      //   date: new Date(),
-      // timeFrom: "",
-      // timeTo: "",
+      date: null,
+      timeFrom: "",
+      timeTo: "",
     },
+    initialErrors: { timeFrom: null, timeTo: null },
     validate: {
-      date: (value) => value === undefined && "Please enter a date",
-      timeFrom: (value) => value > form.values.timeTo && "Invalid time range",
-      timeTo: (value) => value < form.values.timeFrom && "Invalid time range",
+      date: (value) => !value && "Please enter a date",
+      timeFrom: (value) =>
+        value === ""
+          ? null
+          : value > form.values.timeTo
+          ? "Invalid time range"
+          : value && !form.values.timeTo
+          ? "Invalid time range"
+          : !value && form.values.timeTo && "Invalid time range",
+
+      timeTo: (value) =>
+        value === ""
+          ? null
+          : value < form.values.timeFrom
+          ? "Invalid time range"
+          : value && !form.values.timeFrom
+          ? "Invalid time range"
+          : !value && form.values.timeFrom && "Invalid time range",
     },
   });
 
@@ -64,12 +79,18 @@ function OwnerDashboard() {
     setLoading(false);
   };
 
+  const handleClearFilter = () => {
+    form.reset();
+    setLoading(true);
+    getInitialList();
+  };
+
   const filterList = async () => {
     setLoading(true);
     let startDateTime;
     let endDateTime;
 
-    if (!form.values.timeFrom && !form.values.timeTo ) {
+    if (!form.values.timeFrom && !form.values.timeTo) {
       startDateTime = dayjs(form.values.date).startOf("day").format();
       endDateTime = dayjs(form.values.date).endOf("day").format();
     } else {
@@ -113,6 +134,7 @@ function OwnerDashboard() {
 
   const refFrom = useRef(null);
   const refTo = useRef(null);
+
   const pickerControlFrom = (
     <ActionIcon
       variant="subtle"
@@ -162,6 +184,14 @@ function OwnerDashboard() {
           />
           <Button type="submit" mt="25px">
             Filter
+          </Button>
+          <Button
+            mt="25px"
+            variant="outline"
+            onClick={handleClearFilter}
+            disabled={!form.isDirty()}
+          >
+            Clear
           </Button>
         </Group>
       </form>

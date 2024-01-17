@@ -20,6 +20,7 @@ import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import useCheckDaysOfWeek from "../../hooks/useCheckDaysOfWeek";
 
 function NewBooking() {
   const [data, setData] = useState([]);
@@ -32,6 +33,8 @@ function NewBooking() {
   const { successToast, errorToast } = useToast();
   const ref = useRef(null);
   dayjs.extend(customParseFormat);
+  const { isInputDayClosed } = useCheckDaysOfWeek();
+  const [isDayClosed, setIsDayClosed] = useState(false);
 
   useEffect(() => {
     getData();
@@ -54,8 +57,11 @@ function NewBooking() {
   const form = useForm({
     initialValues: {
       time: "",
-      // TODO: get next date of today as default
-      date: new Date(),
+      date: new Date(
+        dayjs().add(1, "day")
+      ),
+      pax: 2,
+      request: "",
     },
     validate: {
       pax: (value) =>
@@ -72,13 +78,20 @@ function NewBooking() {
           ? "Please enter a date"
           : value < new Date()
           ? "Date must be in the future"
-          : value > new Date().setDate(new Date().getDate() + 14) &&
-            "Date must be within 14 days",
+          : value > new Date().setDate(new Date().getDate() + 14)
+          ? "Date must be within 14 days"
+          : isDayClosed && "Restaurant is closed on this day",
       time: (value) => value === "" && "Please enter a time",
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
+
+  useEffect(() => {
+    if (data?.daysClose) {
+      setIsDayClosed(isInputDayClosed(data?.daysClose, form.values.date));
+    }
+  }, [data.daysClose, form.values.date, isInputDayClosed]);
 
   const handleSubmit = async () => {
     const timeToAdd = form.values.time;
