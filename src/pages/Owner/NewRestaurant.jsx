@@ -57,8 +57,6 @@ function NewRestaurant() {
   });
 
   const handleSubmit = async () => {
-    // console.log(form.values);
-
     try {
       const res = await sendRequest(
         `${import.meta.env.VITE_API_URL}restaurant/create`,
@@ -109,6 +107,7 @@ function NewRestaurant() {
       <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
     </ActionIcon>
   );
+
   const pickerControlClose = (
     <ActionIcon
       variant="subtle"
@@ -147,19 +146,6 @@ function NewRestaurant() {
       </ul>
     );
   };
-  const modalContent = (
-    <ul>
-      <li> test</li>
-      {/* <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-      // TOTO change format to hh:mm A
-      <li>Time: {form.values.time}</li>
-      {" "}
-      <li>
-       Description: {form.values.description ? form.values.request : "None"}
-        {" "}
-      </li> */}
-    </ul>
-  );
 
   return (
     <>
@@ -181,14 +167,6 @@ function NewRestaurant() {
             {...form.getInputProps("name")}
           />
           <Select
-            label="Location"
-            withAsterisk
-            placeholder="Pick one"
-            data={["North", "South", "East", "West", "Central"]}
-            mt="md"
-            {...form.getInputProps("location")}
-          />
-          <Select
             label="Category"
             withAsterisk
             placeholder="Pick one"
@@ -196,6 +174,15 @@ function NewRestaurant() {
             mt="md"
             {...form.getInputProps("category")}
           />
+          <Select
+            label="Location"
+            withAsterisk
+            placeholder="Pick one"
+            data={["North", "South", "East", "West", "Central"]}
+            mt="md"
+            {...form.getInputProps("location")}
+          />
+
           <TextInput
             label="Address"
             withAsterisk
@@ -206,7 +193,7 @@ function NewRestaurant() {
           <TextInput
             label="Phone"
             type="number"
-            placeholder="0123 4567 (Exclude +65 country code)"
+            placeholder="01234567 (Exclude +65 country code)"
             mt="md"
             {...form.getInputProps("phone")}
           />
@@ -228,22 +215,22 @@ function NewRestaurant() {
             label="Opening Time"
             withAsterisk
             mt="md"
-            ref={ref}
-            rightSection={pickerControl}
+            ref={refOpen}
             required="true"
+            rightSection={pickerControlOpen}
             {...form.getInputProps("timeOpen")}
           />
           <TimeInput
             label="Closing Time"
             withAsterisk
             mt="md"
-            ref={ref}
+            ref={refClose}
             required="true"
-            rightSection={pickerControl}
+            rightSection={pickerControlClose}
             {...form.getInputProps("timeClose")}
           />
           <MultiSelect
-            label="Days Close"
+            label="Days Closed"
             placeholder="Pick one or more"
             data={[
               "Sunday",
@@ -278,7 +265,7 @@ function NewRestaurant() {
             <Button
               type="button"
               component={Link}
-              to={`/owner/bookings`} //return to Owner Dashboard
+              to={`/owner/restaurant`} //return to Owner Dashboard
               variant="outline"
             >
               Cancel
