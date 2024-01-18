@@ -1,3 +1,5 @@
+//have uploaded all these data to dummy dataset in backend
+
 export const restaurants = [
   {
     id: 1,

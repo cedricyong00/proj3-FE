@@ -6,7 +6,7 @@ export function Footer() {
     <div className={classes.footer}>
       <Container className={classes.inner}>
         <Text c="dimmed" size="sm">
-          © 2023 GA Unit3 All rights reserved.
+          ©2024 ChopeSeats All rights reserved.
         </Text>
       </Container>
     </div>
