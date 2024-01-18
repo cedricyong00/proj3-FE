@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
-import { Text } from "@mantine/core";
+import { Text,Button} from "@mantine/core";
 import classes from "../User/Account.module.css";
 import "../User/Account.module.css";
+import { Link } from "react-router-dom";
 
 function Account() {
   const dummyData = [
@@ -54,9 +55,9 @@ function Account() {
   return (
     <>
         <div className={classes.root}>{stats}</div>
-        <div className="Split">
-            <button className="Buttons">Edit Restaurant Info</button>
-            <button className="Buttons">See Bookings</button>
+        <div className={classes.Split}>
+            <Button className={classes.Buttons} component={Link} to="/owner/restaurant/edit">Edit Restaurant Info</Button>
+            <Button className={classes.Buttons} component={Link} to="/account/bookings">See Bookings</Button>
         </div>
     </>
   )

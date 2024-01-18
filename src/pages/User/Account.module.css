@@ -57,7 +57,8 @@
   }
 
   .Split {
-    margin-top: 100px;
+    margin-top: 30px;
+    margin-left: 200px;
   }
 
   .Buttons {
@@ -66,4 +67,10 @@
       var(--mantine-color-blue-4) 0%,
       var(--mantine-color-blue-7) 100%
     );
+    margin-left: 150px;
+    border-radius: 10px;
+    font-family:
+      Greycliff CF,
+      var(--mantine-font-family);
+    border: none;
   }
