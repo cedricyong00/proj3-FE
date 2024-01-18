@@ -56,7 +56,7 @@ function Account() {
     <>
         <div className={classes.root}>{stats}</div>
         <div className={classes.Split}>
-            <Button className={classes.Buttons} component={Link} to="/owner/restaurant/edit">Edit Restaurant Info</Button>
+            <Button className={classes.Buttons} component={Link} to="/account/edit">Edit Account Info</Button>
             <Button className={classes.Buttons} component={Link} to="/account/bookings">See Bookings</Button>
         </div>
     </>

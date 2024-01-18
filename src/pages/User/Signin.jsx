@@ -12,7 +12,6 @@ import {
 import classes from "./Signin.module.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Header } from "../../components/Layout/Header";
 
 function SignInPage() {
   //Function to redirect users upon clicking button
@@ -30,7 +29,7 @@ function SignInPage() {
       Password: password,
     };
     setTimeout(() => {
-      navigate("/");
+      navigate("/account");
     }, 5000);
   };
 
