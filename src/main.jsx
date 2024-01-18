@@ -27,13 +27,7 @@ const theme = createTheme({
   fontFamily: "Montserrat, sans-serif",
   defaultRadius: "md",
   cursorType: "pointer",
-  breakpoints: {
-    xs: "30em",
-    sm: "48em",
-    md: "64em",
-    lg: "74em",
-    xl: "90em",
-  },
+  primaryColor: "yellow",
 });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -65,6 +59,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             {/* Booking */}
             <Route path="/booking/:id/edit" element={<EditBooking />} />
 
+            {/* Owner */}
             <Route path="/owner/bookings" element={<OwnerDashboard />} />
             <Route path="/owner/restaurant" element={<RestaurantInfo />} />
             <Route path="/owner/restaurant/new" element={<NewRestaurant />} />

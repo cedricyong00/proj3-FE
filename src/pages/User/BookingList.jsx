@@ -44,7 +44,7 @@ function BookingList() {
   const handleSubmit = async () => {
     try {
       await sendRequest(
-        `${import.meta.env.VITE_API_URL}/booking/${dataToCancel._id}/delete`,
+        `${import.meta.env.VITE_API_URL}/booking/${dataToCancel._id}/`,
         "DELETE"
       );
       setData((prev) =>
@@ -65,9 +65,8 @@ function BookingList() {
   const rows = data.map((row) => (
     <Table.Tr key={row._id}>
       <Table.Td>
-        <Anchor component={Link} to="/restaurant/1">
-          {/* TODO */}
-          Wildfire Steakhouse
+        <Anchor component={Link} to={`/restaurant/${row.restaurant._id}`}>
+          {row.restaurant.name ? row.restaurant.name : "Restaurant Name"}
         </Anchor>
       </Table.Td>
 
