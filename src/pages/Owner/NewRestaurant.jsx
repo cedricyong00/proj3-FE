@@ -17,13 +17,12 @@ import { IconClock } from "@tabler/icons-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { useRef } from "react";
-// import { DatesProvider } from '@mantine/dates';
-// import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
 
 function NewRestaurant() {
+  // manage the state of whether a component (such as a modal) is open or closed.
   const [opened, { toggle, close }] = useDisclosure(false);
   // const navigate = useNavigate();
   const { sendRequest } = useFetch();
@@ -61,35 +60,31 @@ function NewRestaurant() {
   });
 
   const handleSubmit = async () => {
-    console.log(form.values);
-
-    const pyl = {
-      // add user info in req body
-      name: form.values.name,
-      image: form.values.image,
-      category: form.values.category,
-      location: form.values.location,
-      timeOpen: parseInt(form.values.timeOpen.split(":").join("")),
-      timeClose: parseInt(form.values.timeClose.split(":").join("")),
-      address: form.values.address,
-      daysClose: form.values.daysClose,
-      phone: form.values.phone,
-      websiteUrl: form.values.websiteUrl,
-      maxPax: form.values.maxPax,
-      description: form.values.description,
-    };
-
-    console.log(pyl);
+    // console.log(form.values);
 
     try {
       const res = await sendRequest(
         `${import.meta.env.VITE_API_URL}restaurant/create`,
         "POST",
-        pyl
+        {
+          // add user info in req body
+          name: form.values.name,
+          image: form.values.image,
+          category: form.values.category,
+          location: form.values.location,
+          timeOpen: parseInt(form.values.timeOpen.split(":").join("")),
+          timeClose: parseInt(form.values.timeClose.split(":").join("")),
+          address: form.values.address,
+          daysClose: form.values.daysClose,
+          phone: form.values.phone,
+          websiteUrl: form.values.websiteUrl,
+          maxPax: form.values.maxPax,
+          description: form.values.description,
+        }
       );
       console.log(res);
       // navigate("/restaurant/:restid");
-      close();
+      // close();
       successToast({
         title: "Restaurant Info Successfully Created!",
         message: "Your restaurant is now listed and available for reservations",
@@ -98,6 +93,8 @@ function NewRestaurant() {
       console.log(err);
       close();
       errorToast();
+    } finally {
+      close();
     }
   };
 
@@ -113,19 +110,34 @@ function NewRestaurant() {
     </ActionIcon>
   );
 
-  const modalContent = (
-    <ul>
-      <li> test</li>
-      {/* <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-      // TOTO change format to hh:mm A 
-      <li>Time: {form.values.time}</li>
-      {" "}
-      <li>
-       Description: {form.values.description ? form.values.request : "None"}
-        {" "}
-      </li> */}
-    </ul>
-  );
+  const modalContent = (form) => {
+    const restDetails = {
+      // add user info in req body
+      Name: form.values.name,
+      Category: form.values.category,
+      Address: form.values.address,
+      Location: form.values.location,
+      OpeningHours:
+        form.values.timeClose && form.values.timeOpen
+          ? `${form.values.timeOpen} - ${form.values.timeClose}`
+          : "No opening hours specified",
+      DaysClosed: form.values.daysClose
+        ? form.values.daysClose
+        : "No rest days specified",
+      Phone: form.values.phone ? form.values.phone : "No phone number provided",
+      MaximumPax: form.values.maxPax,
+    };
+
+    return (
+      <ul>
+        {Object.entries(restDetails).map(([key, val]) => (
+          <li key={key}>
+            {key}: {val}
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
   return (
     <>
@@ -181,6 +193,7 @@ function NewRestaurant() {
             label="Maximum Pax"
             placeholder="pls indicate the max no. of pax your restaurant will accept for bookings"
             min={1}
+            required="true"
             mt="md"
             {...form.getInputProps("maxPax")}
           />
@@ -189,12 +202,14 @@ function NewRestaurant() {
             mt="md"
             ref={ref}
             rightSection={pickerControl}
+            required="true"
             {...form.getInputProps("timeOpen")}
           />
           <TimeInput
             label="Closing Time"
             mt="md"
             ref={ref}
+            required="true"
             rightSection={pickerControl}
             {...form.getInputProps("timeClose")}
           />
@@ -231,7 +246,7 @@ function NewRestaurant() {
             <Button
               type="button"
               component={Link}
-              to={`/owner/bookings`}
+              to={`/owner/bookings`} //return to Owner Dashboard
               variant="outline"
             >
               Cancel
@@ -244,7 +259,7 @@ function NewRestaurant() {
         <Modal
           opened={opened}
           title="Create Your Restaurant"
-          modalContent={modalContent}
+          modalContent={modalContent(form)}
           toggle={toggle}
           close={close}
           handleSubmit={handleSubmit}
