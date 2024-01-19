@@ -20,7 +20,7 @@ import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import useCheckDaysOfWeek from "../../hooks/useCheckDaysOfWeek";
+import useCheckBooking from "../../hooks/useCheckBooking";
 
 function NewBooking() {
   const [data, setData] = useState([]);
@@ -33,8 +33,9 @@ function NewBooking() {
   const { successToast, errorToast } = useToast();
   const ref = useRef(null);
   dayjs.extend(customParseFormat);
-  const { isInputDayClosed } = useCheckDaysOfWeek();
+  const { isInputDayClosed, formatTime } = useCheckBooking();
   const [isDayClosed, setIsDayClosed] = useState(false);
+  const [operationHours, setOperationHours] = useState({});
 
   useEffect(() => {
     getData();
@@ -57,9 +58,7 @@ function NewBooking() {
   const form = useForm({
     initialValues: {
       time: "",
-      date: new Date(
-        dayjs().add(1, "day")
-      ),
+      date: new Date(dayjs().add(1, "day")),
       pax: 2,
       request: "",
     },
@@ -81,11 +80,25 @@ function NewBooking() {
           : value > new Date().setDate(new Date().getDate() + 14)
           ? "Date must be within 14 days"
           : isDayClosed && "Restaurant is closed on this day",
-      time: (value) => value === "" && "Please enter a time",
+      time: (value) =>
+        value === ""
+          ? "Please enter a time"
+          : value < operationHours.timeOpen || value > operationHours.timeClose
+          ? "Please enter a time within opening hours"
+          : null,
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
+
+  useEffect(() => {
+    if (data?.timeOpen && data?.timeClose) {
+      setOperationHours({
+        timeOpen: formatTime(data.timeOpen),
+        timeClose: formatTime(data.timeClose),
+      });
+    }
+  }, [data.timeOpen, data.timeClose, form.values.time, formatTime]);
 
   useEffect(() => {
     if (data?.daysClose) {

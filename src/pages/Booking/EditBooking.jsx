@@ -20,7 +20,7 @@ import useFetch from "../../hooks/useFetch";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import useToast from "../../hooks/useToast";
 import customParseFormat from "dayjs/plugin/customParseFormat";
-import useCheckDaysOfWeek from "../../hooks/useCheckDaysOfWeek";
+import useCheckBooking from "../../hooks/useCheckBooking";
 
 function EditBooking() {
   const navigate = useNavigate();
@@ -33,8 +33,9 @@ function EditBooking() {
   const { successToast, errorToast } = useToast();
   const [data, setData] = useState([]);
   dayjs.extend(customParseFormat);
-  const { isInputDayClosed } = useCheckDaysOfWeek();
+  const { isInputDayClosed, formatTime } = useCheckBooking();
   const [isDayClosed, setIsDayClosed] = useState(false);
+  const [operationHours, setOperationHours] = useState({});
 
   useEffect(() => {
     getSingleBooking();
@@ -75,11 +76,25 @@ function EditBooking() {
           : value > new Date().setDate(new Date().getDate() + 14)
           ? "Date must be within 14 days"
           : isDayClosed && "Restaurant is closed on this day",
-      time: (value) => value === "" && "Please enter a time",
+      time: (value) =>
+        value === ""
+          ? "Please enter a time"
+          : value < operationHours.timeOpen || value > operationHours.timeClose
+          ? "Please enter a time within opening hours"
+          : null,
       request: (value) =>
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
+
+  useEffect(() => {
+    if (data?.restaurant?.timeOpen && data?.restaurant?.timeClose) {
+      setOperationHours({
+        timeOpen: formatTime(data.restaurant.timeOpen),
+        timeClose: formatTime(data.restaurant.timeClose),
+      });
+    }
+  }, [data?.restaurant?.timeOpen, data?.restaurant?.timeClose, form.values.time, formatTime]);
 
   useEffect(() => {
     if (data?.restaurant?.daysClose) {
