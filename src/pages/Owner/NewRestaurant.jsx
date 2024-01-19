@@ -59,7 +59,7 @@ function NewRestaurant() {
   const handleSubmit = async () => {
     try {
       const res = await sendRequest(
-        `${import.meta.env.VITE_API_URL}restaurant/create`,
+        `${import.meta.env.VITE_API_URL}/restaurant/create`,
         "POST",
         {
           // add user info in req body
