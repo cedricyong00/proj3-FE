@@ -126,7 +126,7 @@ function OwnerDashboard() {
       <Table.Td>{dayjs(row.dateTime).format("DD/MM/YYYY")}</Table.Td>
       <Table.Td>{dayjs(row.dateTime).format("hh:mmA")}</Table.Td>
       <Table.Td>{row.pax}</Table.Td>
-      <Table.Td>{row.request ? row.request : "None"}</Table.Td>
+      <Table.Td>{row.request && row.request}</Table.Td>
       {/* TODO */}
       <Table.Td>email@email.cpm</Table.Td>
     </Table.Tr>
