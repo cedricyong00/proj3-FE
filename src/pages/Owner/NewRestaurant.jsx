@@ -17,13 +17,12 @@ import { IconClock } from "@tabler/icons-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { useRef } from "react";
-// import { DatesProvider } from '@mantine/dates';
-// import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
 
 function NewRestaurant() {
+  // manage the state of whether a component (such as a modal) is open or closed.
   const [opened, { toggle, close }] = useDisclosure(false);
   const navigate = useNavigate();
   const { sendRequest } = useFetch();
@@ -58,33 +57,29 @@ function NewRestaurant() {
   });
 
   const handleSubmit = async () => {
-    console.log(form.values);
-
-    const pyl = {
-      // add user info in req body
-      name: form.values.name,
-      image: form.values.image,
-      category: form.values.category,
-      location: form.values.location,
-      timeOpen: parseInt(form.values.timeOpen.split(":").join("")),
-      timeClose: parseInt(form.values.timeClose.split(":").join("")),
-      address: form.values.address,
-      daysClose: form.values.daysClose,
-      phone: form.values.phone,
-      websiteUrl: form.values.websiteUrl,
-      maxPax: form.values.maxPax,
-      description: form.values.description,
-    };
-
-    console.log(pyl);
-
     try {
       const res = await sendRequest(
         `${import.meta.env.VITE_API_URL}/restaurant/create`,
         "POST",
-        pyl
+        {
+          // add user info in req body
+          name: form.values.name,
+          image: form.values.image,
+          category: form.values.category,
+          location: form.values.location,
+          timeOpen: parseInt(form.values.timeOpen.split(":").join("")),
+          timeClose: parseInt(form.values.timeClose.split(":").join("")),
+          address: form.values.address,
+          daysClose: form.values.daysClose,
+          phone: form.values.phone,
+          websiteUrl: form.values.websiteUrl,
+          maxPax: form.values.maxPax,
+          description: form.values.description,
+        }
       );
       console.log(res);
+      // navigate("/restaurant/:restid");
+      // close();
       navigate("/owner/restaurant");
       close();
       successToast({
@@ -95,6 +90,8 @@ function NewRestaurant() {
       console.log(err);
       close();
       errorToast();
+    } finally {
+      close();
     }
   };
 
@@ -110,6 +107,7 @@ function NewRestaurant() {
       <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
     </ActionIcon>
   );
+
   const pickerControlClose = (
     <ActionIcon
       variant="subtle"
@@ -120,19 +118,34 @@ function NewRestaurant() {
     </ActionIcon>
   );
 
-  const modalContent = (
-    <ul>
-      <li> test</li>
-      {/* <li>Date: {dayjs(form.values.date).format("DD/MM/YYYY")}</li>
-      // TOTO change format to hh:mm A
-      <li>Time: {form.values.time}</li>
-      {" "}
-      <li>
-       Description: {form.values.description ? form.values.request : "None"}
-        {" "}
-      </li> */}
-    </ul>
-  );
+  const modalContent = (form) => {
+    const restDetails = {
+      // add user info in req body
+      Name: form.values.name,
+      Category: form.values.category,
+      Address: form.values.address,
+      Location: form.values.location,
+      OpeningHours:
+        form.values.timeClose && form.values.timeOpen
+          ? `${form.values.timeOpen} - ${form.values.timeClose}`
+          : "No opening hours specified",
+      DaysClosed: form.values.daysClose
+        ? form.values.daysClose
+        : "No rest days specified",
+      Phone: form.values.phone ? form.values.phone : "No phone number provided",
+      MaximumPax: form.values.maxPax,
+    };
+
+    return (
+      <ul>
+        {Object.entries(restDetails).map(([key, val]) => (
+          <li key={key}>
+            {key}: {val}
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
   return (
     <>
@@ -154,14 +167,6 @@ function NewRestaurant() {
             {...form.getInputProps("name")}
           />
           <Select
-            label="Location"
-            withAsterisk
-            placeholder="Pick one"
-            data={["North", "South", "East", "West", "Central"]}
-            mt="md"
-            {...form.getInputProps("location")}
-          />
-          <Select
             label="Category"
             withAsterisk
             placeholder="Pick one"
@@ -169,6 +174,15 @@ function NewRestaurant() {
             mt="md"
             {...form.getInputProps("category")}
           />
+          <Select
+            label="Location"
+            withAsterisk
+            placeholder="Pick one"
+            data={["North", "South", "East", "West", "Central"]}
+            mt="md"
+            {...form.getInputProps("location")}
+          />
+
           <TextInput
             label="Address"
             withAsterisk
@@ -179,7 +193,7 @@ function NewRestaurant() {
           <TextInput
             label="Phone"
             type="number"
-            placeholder="0123 4567 (Exclude +65 country code)"
+            placeholder="01234567 (Exclude +65 country code)"
             mt="md"
             {...form.getInputProps("phone")}
           />
@@ -193,6 +207,7 @@ function NewRestaurant() {
             label="Maximum Pax"
             placeholder="10"
             min={1}
+            required="true"
             mt="md"
             {...form.getInputProps("maxPax")}
           />
@@ -201,6 +216,7 @@ function NewRestaurant() {
             withAsterisk
             mt="md"
             ref={refOpen}
+            required="true"
             rightSection={pickerControlOpen}
             {...form.getInputProps("timeOpen")}
           />
@@ -209,11 +225,12 @@ function NewRestaurant() {
             withAsterisk
             mt="md"
             ref={refClose}
+            required="true"
             rightSection={pickerControlClose}
             {...form.getInputProps("timeClose")}
           />
           <MultiSelect
-            label="Days Close"
+            label="Days Closed"
             placeholder="Pick one or more"
             data={[
               "Sunday",
@@ -248,7 +265,7 @@ function NewRestaurant() {
             <Button
               type="button"
               component={Link}
-              to={`/owner/restaurant`}
+              to={`/owner/restaurant`} //return to Owner Dashboard
               variant="outline"
             >
               Cancel
@@ -261,7 +278,7 @@ function NewRestaurant() {
         <Modal
           opened={opened}
           title="Create Your Restaurant"
-          modalContent={modalContent}
+          modalContent={modalContent(form)}
           toggle={toggle}
           close={close}
           handleSubmit={handleSubmit}
