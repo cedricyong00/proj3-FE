@@ -20,7 +20,7 @@ function RestaurantList() {
   const getList = async () => {
     try {
       const resData = await sendRequest(
-        `${import.meta.env.VITE_API_URL}restaurant`,
+        `${import.meta.env.VITE_API_URL}/restaurant`,
         "GET"
       );
       setData(resData.restaurants);

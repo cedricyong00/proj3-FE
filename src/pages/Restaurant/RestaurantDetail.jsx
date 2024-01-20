@@ -21,7 +21,7 @@ function RestaurantDetail() {
   const getData = async () => {
     try {
       const resData = await sendRequest(
-        `${import.meta.env.VITE_API_URL}restaurant/${pathId}`,
+        `${import.meta.env.VITE_API_URL}/restaurant/${pathId}`,
         "GET"
       );
       setData(resData);
