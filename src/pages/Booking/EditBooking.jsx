@@ -11,7 +11,12 @@ import {
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
@@ -23,11 +28,9 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import useCheckBooking from "../../hooks/useCheckBooking";
 
 function EditBooking() {
-  const navigate = useNavigate();
   const [opened, { toggle, close }] = useDisclosure(false);
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
-  const [loading, setLoading] = useState(true);
   const { sendRequest } = useFetch();
   const ref = useRef(null);
   const { successToast, errorToast } = useToast();
@@ -37,8 +40,17 @@ function EditBooking() {
   const [isDayClosed, setIsDayClosed] = useState(false);
   const [operationHours, setOperationHours] = useState({});
 
+  const { user } = useOutletContext();
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
   useEffect(() => {
     getSingleBooking();
+    if (!user) {
+      navigate("/signin");
+      return;
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -94,7 +106,12 @@ function EditBooking() {
         timeClose: formatTime(data.restaurant.timeClose),
       });
     }
-  }, [data?.restaurant?.timeOpen, data?.restaurant?.timeClose, form.values.time, formatTime]);
+  }, [
+    data?.restaurant?.timeOpen,
+    data?.restaurant?.timeClose,
+    form.values.time,
+    formatTime,
+  ]);
 
   useEffect(() => {
     if (data?.restaurant?.daysClose) {
@@ -162,7 +179,7 @@ function EditBooking() {
       ) : (
         <>
           <Title order={2} ta="center">
-            Reserve a table at {data.restaurant.name}
+            Update a reservation at {data?.restaurant?.name}
           </Title>
           <Box maw={340} mx="auto" mt="xl">
             <form
