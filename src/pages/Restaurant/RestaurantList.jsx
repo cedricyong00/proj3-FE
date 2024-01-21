@@ -1,4 +1,4 @@
-import { Grid } from "@mantine/core";
+import { Grid, rem, AspectRatio } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
@@ -37,19 +37,28 @@ function RestaurantList() {
       ) : (
         <div>
           <h2>RestaurantList</h2>
-          <Grid justify="flex-start" align="flex-start" overflow="hidden">
+          <Grid
+            justify="flex-start"
+            align="flex-start"
+            overflow="hidden"
+            columns={4}
+          >
             {data.map((restaurant) => (
               <div key={restaurant._id}>
-                <Grid.Col
-                  span={{ base: 12, md: 6, lg: 3 }}
-                  style={{ minHeight: rem(80) }}
-                >
+                <Grid.Col span={4} style={{ minHeight: rem(80) }}>
                   <h3>
                     <Link to={`/restaurant/${restaurant._id}`}>
+                      <AspectRatio ratio={1080 / 720} maw={300} mx="auto">
+                        <img src={restaurant.image} alt="no image available" />
+                      </AspectRatio>
                       {restaurant.name}
                     </Link>
                   </h3>
-                  //insert elements here
+                  <h5>
+                    {restaurant.category} / {restaurant.location} <br />
+                    {restaurant.timeOpen} - {restaurant.timeClose} <br />
+                    {restaurant.address}`
+                  </h5>
                 </Grid.Col>
               </div>
             ))}
