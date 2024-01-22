@@ -78,8 +78,6 @@ function NewRestaurant() {
         }
       );
       console.log(res);
-      // navigate("/restaurant/:restid");
-      // close();
       navigate("/owner/restaurant");
       close();
       successToast({
