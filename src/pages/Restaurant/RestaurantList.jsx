@@ -87,9 +87,8 @@ function RestaurantList() {
                       w="100%"
                       h={200}
                       style={{
-                        "align-self": "flex-start",
                         overflow: "hidden",
-                        "border-radius": "var(--mantine-radius-md)",
+                        borderRadius: "var(--mantine-radius-md)",
                       }}
                       className={classes.image}
                     >
