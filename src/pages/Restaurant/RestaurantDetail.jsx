@@ -1,8 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { Flex, Button, Stack, Box, Image } from "@mantine/core";
+import { Flex, Button, Stack, Image, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
-import dayjs from "dayjs";
 import classes from "./RestaurantList.module.css";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import useCheckBooking from "../../hooks/useCheckBooking";
@@ -46,8 +45,8 @@ function RestaurantDetail() {
         ? detail.daysClose
         : "No rest days specified",
       Phone: detail.phone ? detail.phone : "No phone number provided",
-      Website: detail.websiteURL,
-      MaximumPax: detail.maxPax ? detail.maxPax : "-",
+      Website: detail.websiteURL ? detail.websiteURL : "-",
+      "Maximum Pax": detail.maxPax ? detail.maxPax : "-",
     };
 
     return Object.entries(restDeets).map(([key, val]) => (
@@ -64,7 +63,6 @@ function RestaurantDetail() {
       ) : (
         <>
           <Stack ta="center">
-            <h2>{data.name}</h2>
             <Flex
               gap="md"
               justify="center"
@@ -72,12 +70,13 @@ function RestaurantDetail() {
               direction="column"
               wrap="wrap"
             >
+              <h2>{data.name}</h2>
               <Image
                 src={data.image}
                 alt="no image available"
-                // w="80%"
-                // h="80%"
                 className={classes.image}
+                w="80%"
+                h="50%"
               ></Image>
               <Button
                 mt="sm"
@@ -86,10 +85,15 @@ function RestaurantDetail() {
               >
                 Reserve a table
               </Button>
-              <Flex direction="column" w="100%" h="100%">
-                <p>{restDetails(data)}</p>
-                <br />
-                <p>{data.description}</p>
+              <Flex w="80%">
+                <Text ta="left">
+                  <p>{restDetails(data)}</p>
+                  <p>
+                    <br />
+                    Description: <br />
+                    {data.description}
+                  </p>
+                </Text>
               </Flex>
             </Flex>
           </Stack>
