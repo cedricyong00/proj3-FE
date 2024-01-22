@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import cx from "clsx";
 import { useState } from "react";
 import {
@@ -20,21 +21,29 @@ import {
   IconStar,
   IconChevronDown,
   IconMapPin,
+  IconSettings,
 } from "@tabler/icons-react";
 import classes from "./HeaderTabs.module.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo-new.png";
+import useToast from "../../hooks/useToast";
 
-const dummyUser = {
-  name: "John Doe",
-  email: "janspoon@fighter.dev",
-  isOwner: true,
-};
-
-export const Header = () => {
+export const Header = ({ user, setUser }) => {
   const theme = useMantineTheme();
-  // const [opened, { toggle }] = useDisclosure(false);
   const [userMenuOpened, setUserMenuOpened] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { successToast } = useToast();
+
+  const handleLogout = () => {
+    // TODO: Logout user
+    setUser(null);
+    navigate("/");
+    successToast({
+      title: "See you again!",
+      message: "You have successfully logged out.",
+    });
+  };
 
   return (
     <div className={classes.header}>
@@ -52,25 +61,29 @@ export const Header = () => {
             <Anchor component={Link} to="/" underline="never">
               <Flex justify="space-between" direction="row" align="center">
                 <Image src={logo} w={30} h={30} />
-                <Text ml="xs" fw="bold">ChopeSeats</Text>
+                <Text ml="xs" fw="bold">
+                  ChopeSeats
+                </Text>
               </Flex>
             </Anchor>
           </Title>
 
           {/* Auth Buttons*/}
-          {!dummyUser && (
-            <Group visibleFrom="sm">
-              <Button variant="default" component={Link} to="/signin">
-                Log in
-              </Button>
-              <Button component={Link} to="/signup">
-                Sign up
-              </Button>
-            </Group>
-          )}
+          {!user &&
+            location.pathname !== "/signin" &&
+            location.pathname !== "/signup" && (
+              <Group visibleFrom="sm">
+                <Button variant="default" component={Link} to="/signin">
+                  Log in
+                </Button>
+                <Button component={Link} to="/signup">
+                  Sign up
+                </Button>
+              </Group>
+            )}
 
           {/* User Menu */}
-          {dummyUser && (
+          {user && (
             <Menu
               width={260}
               position="bottom-end"
@@ -87,7 +100,7 @@ export const Header = () => {
                 >
                   <Group gap={7}>
                     <Text fw={500} size="sm" lh={1} mr={3}>
-                      Hello {dummyUser.name}!
+                      Hello {user?.name}!
                     </Text>
                     <IconChevronDown
                       style={{ width: rem(12), height: rem(12) }}
@@ -110,7 +123,8 @@ export const Header = () => {
                 >
                   Your Bookings
                 </Menu.Item>
-                {dummyUser.isOwner && (
+
+                {user.isOwner && (
                   <>
                     <Menu.Item
                       component={Link}
@@ -140,18 +154,18 @@ export const Header = () => {
                     </Menu.Item>
                   </>
                 )}
-
-                {/* IceBox */}
-                {/* <Menu.Item
-                leftSection={
-                  <IconSettings
-                    style={{ width: rem(16), height: rem(16) }}
-                    stroke={1.5}
-                  />
-                }
-              >
-                Account settings
-              </Menu.Item> */}
+                <Menu.Item
+                  component={Link}
+                  to="/account"
+                  leftSection={
+                    <IconSettings
+                      style={{ width: rem(16), height: rem(16) }}
+                      stroke={1.5}
+                    />
+                  }
+                >
+                  Account settings
+                </Menu.Item>
 
                 <Menu.Item
                   leftSection={
@@ -160,22 +174,10 @@ export const Header = () => {
                       stroke={1.5}
                     />
                   }
+                  onClick={handleLogout}
                 >
                   Logout
                 </Menu.Item>
-
-                {/* Icebox */}
-                {/* <Menu.Item
-                color="red"
-                leftSection={
-                  <IconTrash
-                    style={{ width: rem(16), height: rem(16) }}
-                    stroke={1.5}
-                  />
-                }
-              >
-                Delete account
-              </Menu.Item> */}
               </Menu.Dropdown>
             </Menu>
           )}
