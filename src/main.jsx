@@ -12,6 +12,7 @@ import BookingList from "./pages/User/BookingList";
 import OwnerDashboard from "./pages/Owner/OwnerDashboard";
 import RestaurantInfo from "./pages/Owner/RestaurantInfo";
 import NewRestaurant from "./pages/Owner/NewRestaurant";
+import EditRestaurant from "./pages/Owner/EditRestaurant";
 import NewBooking from "./pages/Restaurant/NewBooking";
 import NotFound from "./pages/NotFound";
 import EditBooking from "./pages/Booking/EditBooking";
@@ -63,7 +64,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <Route path="/owner/bookings" element={<OwnerDashboard />} />
             <Route path="/owner/restaurant" element={<RestaurantInfo />} />
             <Route path="/owner/restaurant/new" element={<NewRestaurant />} />
-            <Route path="/owner/restaurant/edit" element={<EditAccount />} />
+            <Route path="/owner/restaurant/edit" element={<EditRestaurant />} />
           </Route>
 
           {/* 404 */}
