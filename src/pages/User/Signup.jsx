@@ -14,6 +14,8 @@ import { Header } from "../../components/Layout/Header";
 import CheckboxCard from "../../components/User/Checkbox";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { hashData } from "../../util/security";
+import { signUp } from "../../api/users";
 
 function SignUpPage() {
   //Function to redirect users upon clicking button
@@ -24,19 +26,43 @@ function SignUpPage() {
   //Handle change in form fields
   const [password, setPassword] = useState("");
 
+  //user input
+  const formState = {
+    userEmail: userEmail,
+    password: password,
+    isOwner: isOwner
+  }
+
+  //Function to hash password
+  function hashPassword() {
+    var currForm = formState;
+    if (currForm.password) {
+      console.log(currForm.password)
+      var hash = hashData(currForm.password);
+      currForm.password = hash.hash;
+      currForm.salt = hash.salt;
+      currForm.iterations = hash.iterations;
+    }
+  }
+
   //Function to handle submit events
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const UserDetails = {
-      Email: userEmail,
-      Password: password,
-      IsOwner: isOwner,
-    };
-    console.log(UserDetails);
-    setTimeout(() => {
-      if (isOwner === true) navigate("/signin");
-    }, 5000);
-  };
+  async function handleSubmit (evt) {
+    try {
+        evt.preventDefault();
+        hashPassword();
+        const formData = {...formState};
+        delete formData.error;
+        delete formData.confirm;
+        console.log(formData);
+        const user = await signUp(formData);
+        console.log(user)
+    } catch(e) {
+      console.log(e);
+    }
+        setTimeout(() => {
+          if (isOwner === true) navigate("/signin");
+        }, 5000);
+  }
 
   return (
     <>
