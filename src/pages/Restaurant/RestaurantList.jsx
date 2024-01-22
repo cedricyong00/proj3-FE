@@ -1,4 +1,4 @@
-import { Grid, rem, AspectRatio } from "@mantine/core";
+import { Flex, rem, AspectRatio } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
@@ -36,33 +36,31 @@ function RestaurantList() {
         <LoadingSpinner />
       ) : (
         <div>
-          <h2>RestaurantList</h2>
-          <Grid
+          <h2>Restaurant List</h2>
+          <Flex
+            mih={20}
+            gap="md"
             justify="flex-start"
-            align="flex-start"
-            overflow="hidden"
-            columns={4}
+            align="center"
+            direction="row"
+            wrap="wrap"
           >
             {data.map((restaurant) => (
               <div key={restaurant._id}>
-                <Grid.Col span={4} style={{ minHeight: rem(80) }}>
-                  <h3>
-                    <Link to={`/restaurant/${restaurant._id}`}>
-                      <AspectRatio ratio={1080 / 720} maw={300} mx="auto">
-                        <img src={restaurant.image} alt="no image available" />
-                      </AspectRatio>
-                      {restaurant.name}
-                    </Link>
-                  </h3>
-                  <h5>
-                    {restaurant.category} / {restaurant.location} <br />
-                    {restaurant.timeOpen} - {restaurant.timeClose} <br />
-                    {restaurant.address}`
-                  </h5>
-                </Grid.Col>
+                <Link to={`/restaurant/${restaurant._id}`}>
+                  <AspectRatio ratio={1} style={{ flex: `0 1 ${rem(100)}` }}>
+                    <img src={restaurant.image} alt="no image available" />{" "}
+                  </AspectRatio>
+                  <h3> {restaurant.name}</h3>{" "}
+                </Link>
+                <h5>
+                  {restaurant.category} / {restaurant.location} <br />
+                  {restaurant.timeOpen} - {restaurant.timeClose} <br />
+                  {restaurant.address}`
+                </h5>
               </div>
             ))}
-          </Grid>
+          </Flex>
         </div>
       )}
     </>
