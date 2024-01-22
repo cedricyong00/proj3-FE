@@ -1,21 +1,33 @@
-import { Flex, rem, AspectRatio } from "@mantine/core";
+import {
+  Flex,
+  Title,
+  Anchor,
+  Image,
+  Box,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import { useMediaQuery } from "@mantine/hooks";
+import classes from "./RestaurantList.module.css";
+import { IconClock, IconMapPin, IconToolsKitchen3 } from "@tabler/icons-react";
+import useCheckBooking from "../../hooks/useCheckBooking";
 
-// Temporary code for fetching data. Feel free to discard.
 function RestaurantList() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const { sendRequest } = useFetch();
+  const theme = useMantineTheme();
+  const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
+  const { formatTime } = useCheckBooking();
 
   useEffect(() => {
     getList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  console.log(data);
 
   const getList = async () => {
     try {
@@ -23,7 +35,16 @@ function RestaurantList() {
         `${import.meta.env.VITE_API_URL}/restaurant`,
         "GET"
       );
-      setData(resData.restaurants);
+      const formattedData = resData.restaurants.map((restaurant) => {
+        const timeOpen = restaurant.timeOpen
+          ? formatTime(restaurant.timeOpen)
+          : null;
+        const timeClose = restaurant.timeClose
+          ? formatTime(restaurant.timeClose)
+          : null;
+        return { ...restaurant, timeOpen, timeClose };
+      });
+      setData(formattedData);
     } catch (err) {
       console.log(err);
     }
@@ -35,33 +56,109 @@ function RestaurantList() {
       {loading ? (
         <LoadingSpinner />
       ) : (
-        <div>
-          <h2>Restaurant List</h2>
+        <>
+          <Title order={2} ta="center">
+            Book these tables, now available on ChopeSeats.
+          </Title>
+
           <Flex
-            mih={20}
-            gap="md"
-            justify="flex-start"
-            align="center"
-            direction="row"
+            gap="xl"
+            justify="space-between"
+            align="stretch"
             wrap="wrap"
+            mt="xl"
           >
             {data.map((restaurant) => (
-              <div key={restaurant._id}>
-                <Link to={`/restaurant/${restaurant._id}`}>
-                  <AspectRatio ratio={1} style={{ flex: `0 1 ${rem(100)}` }}>
-                    <img src={restaurant.image} alt="no image available" />{" "}
-                  </AspectRatio>
-                  <h3> {restaurant.name}</h3>{" "}
-                </Link>
-                <h5>
-                  {restaurant.category} / {restaurant.location} <br />
-                  {restaurant.timeOpen} - {restaurant.timeClose} <br />
-                  {restaurant.address}`
-                </h5>
-              </div>
+              <Anchor
+                key={restaurant._id}
+                component={Link}
+                to={`/restaurant/${restaurant._id}`}
+                underline="none"
+                display="block"
+                w={
+                  isPc
+                    ? `calc(33.3333% - var(--mantine-spacing-xl) * 2 / 3`
+                    : `100%`
+                }
+              >
+                <Flex direction="column" w="100%" h="100%">
+                  {restaurant.image ? (
+                    <Box
+                      w="100%"
+                      h={200}
+                      style={{
+                        "align-self": "flex-start",
+                        overflow: "hidden",
+                        "border-radius": "var(--mantine-radius-md)",
+                      }}
+                      className={classes.image}
+                    >
+                      <Image
+                        src={restaurant.image}
+                        alt={restaurant.name}
+                        w="100%"
+                        h="100%"
+                      ></Image>
+                    </Box>
+                  ) : (
+                    <Flex
+                      radius="md"
+                      w="100%"
+                      h={200}
+                      bg="gray.2"
+                      align="center"
+                      justify="center"
+                      className={classes.image}
+                      style={{
+                        borderRadius: "var(--mantine-radius-md)",
+                      }}
+                    >
+                      <Text c="gray" ta="center">
+                        No Image
+                      </Text>
+                    </Flex>
+                  )}
+
+                  <Title order={3} mt="sm" lineClamp={2}>
+                    {restaurant.name}
+                  </Title>
+                  <Box w="100%" mt="auto">
+                    <Flex align="center" gap="xs" mt="xs">
+                      <Flex align="center" gap="5px">
+                        <IconToolsKitchen3 w="sm" h="sm" stroke={1.5} />
+                        <Text c="black" lh="1">
+                          {restaurant.category}
+                        </Text>
+                      </Flex>
+                      <Flex align="center" gap="5px">
+                        <IconMapPin w="sm" h="sm" stroke={1.5} />
+                        <Text c="black" lh="1">
+                          {restaurant.location}
+                        </Text>
+                      </Flex>
+                    </Flex>
+
+                    <Flex align="center" gap="5px" style={{ marginTop: "5px" }}>
+                      <IconClock w="sm" h="sm" stroke={1.5} />
+                      <Text c="black" lh="1">
+                        {restaurant.timeOpen} - {restaurant.timeClose}
+                      </Text>
+                    </Flex>
+
+                    <Text
+                      c="black"
+                      size="sm"
+                      lineClamp={1}
+                      style={{ marginTop: "5px" }}
+                    >
+                      {restaurant.address}
+                    </Text>
+                  </Box>
+                </Flex>
+              </Anchor>
             ))}
           </Flex>
-        </div>
+        </>
       )}
     </>
   );
