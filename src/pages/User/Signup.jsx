@@ -1,43 +1,43 @@
-/* eslint-disable no-unused-vars */
 import {
   Anchor,
   Button,
+  Checkbox,
   Container,
+  Group,
   Paper,
   PasswordInput,
   Text,
+  TextInput,
   Title,
 } from "@mantine/core";
-import EmailSignUp from "../../components/User/EmailSignUp";
 import classes from "./Signin.module.css";
-import { Header } from "../../components/Layout/Header";
-import CheckboxCard from "../../components/User/Checkbox";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { hashData } from "../../util/security";
-import { signUp } from "../../api/users";
+import useFetch from "../../hooks/useFetch";
+import useToast from "../../hooks/useToast";
 
 function SignUpPage() {
   //Function to redirect users upon clicking button
   const navigate = useNavigate();
-  const [userEmail, setUserEmail] = useState("");
+  const [email, setEmail] = useState("");
   const [isOwner, setIsOwner] = useState(false);
-
-  //Handle change in form fields
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const { sendRequest } = useFetch();
+  const { successToast, errorToast } = useToast();
 
   //user input
   const formState = {
-    userEmail: userEmail,
+    email: email,
     password: password,
-    isOwner: isOwner
-  }
+    isOwner: isOwner,
+    name: name,
+  };
 
-  //Function to hash password
   function hashPassword() {
     var currForm = formState;
     if (currForm.password) {
-      console.log(currForm.password)
       var hash = hashData(currForm.password);
       currForm.password = hash.hash;
       currForm.salt = hash.salt;
@@ -45,23 +45,25 @@ function SignUpPage() {
     }
   }
 
-  //Function to handle submit events
-  async function handleSubmit (evt) {
+  async function handleSubmit(evt) {
+    evt.preventDefault();
     try {
-        evt.preventDefault();
-        hashPassword();
-        const formData = {...formState};
-        delete formData.error;
-        delete formData.confirm;
-        console.log(formData);
-        const user = await signUp(formData);
-        console.log(user)
-    } catch(e) {
-      console.log(e);
+      hashPassword();
+      const formData = { ...formState };
+      await sendRequest(
+        `${import.meta.env.VITE_API_URL}/user/create`,
+        "POST",
+        formData
+      );
+      navigate("/signin");
+      successToast({
+        title: "Signup Completed!",
+        message: "You have successfully created your account. Please login",
+      });
+    } catch (err) {
+      console.log(err);
+      errorToast(err.message ? err.message : "Error");
     }
-        setTimeout(() => {
-          if (isOwner === true) navigate("/signin");
-        }, 5000);
   }
 
   return (
@@ -77,16 +79,47 @@ function SignUpPage() {
           </Anchor>
         </Text>
         <Paper withBorder shadow="md" p={30} mt={30} radius="md">
-          <EmailSignUp userEmail={userEmail} setUserEmail={setUserEmail} />
+          {/* Name */}
+          <TextInput
+            label="Name"
+            withAsterisk
+            required
+            placeholder="John Tan"
+            onChange={(e) => setName(e.target.value)}
+            value={name}
+          />
+
+          {/* Email */}
+          <TextInput
+            mt="md"
+            withAsterisk
+            label="Email Address"
+            placeholder="email@chopeseats.com"
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
+            required
+          ></TextInput>
+
+          {/* Password */}
           <PasswordInput
             label="Password"
             placeholder="Enter Your Password"
-            required
+            withAsterisk
             mt="md"
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
-          <br />
-          <CheckboxCard isOwner={isOwner} setIsOwner={setIsOwner} />
+
+          {/* IsOwner */}
+          <Group justify="space-between" mt="lg">
+            <Checkbox
+              label="I am a owner of restaurant"
+              checked={isOwner}
+              onChange={() => {
+                setIsOwner((prev) => !prev);
+              }}
+            />
+          </Group>
 
           <Button fullWidth mt="xl" onClick={handleSubmit}>
             Sign Up
