@@ -1,4 +1,4 @@
-// const BASE_URL = "mongodb+srv://cedric:rxSWq1wvUK0heSpZ@cluster0.03lglb6.mongodb.net/restaurantbooking?retryWrites=true&w=majority"
+// const BASE_URL = ""
 
 // export async function signUp(userData) {
 //     const createURL = BASE_URL + '/create';
