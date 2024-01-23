@@ -17,10 +17,12 @@ import { IconClock } from "@tabler/icons-react";
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useDisclosure } from "@mantine/hooks";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
+import useCheckBooking from "../../hooks/useCheckBooking";
 
 function EditRestaurant() {
   const [opened, { toggle, close }] = useDisclosure(false);
@@ -28,7 +30,10 @@ function EditRestaurant() {
   const { sendRequest } = useFetch();
   const { successToast, errorToast } = useToast();
   const [data, setData] = useState([]);
+  const [payload, setPayload] = useState({});
   const [loading, setLoading] = useState(true);
+  const { formatTime } = useCheckBooking();
+  dayjs.extend(customParseFormat);
 
   useEffect(() => {
     getData();
@@ -75,8 +80,8 @@ function EditRestaurant() {
       image: resData.image,
       category: resData.category,
       location: resData.location,
-      timeOpen: dayjs(resData.timeOpen).utc().local().format("HH:mm a"),
-      timeClose: dayjs(resData.timeClose).utc().local().format("HH:mm p"),
+      timeOpen: formatTime(resData.timeOpen),
+      timeClose: formatTime(resData.timeClose),
       address: resData.address,
       daysClose: resData.daysClose,
       phone: resData.phone,
@@ -84,38 +89,17 @@ function EditRestaurant() {
       maxPax: resData.maxPax,
       description: resData.description,
     });
-
-    return (
-      <ul>
-        {Object.entries(restDetails).map(([key, val]) => (
-          <li key={key}>
-            {key}: {val}
-          </li>
-        ))}
-      </ul>
-    );
   };
 
   const handleSubmit = async () => {
     try {
       const res = await sendRequest(
-        `${import.meta.env.VITE_API_URL}/restaurant/create`,
+        // `${import.meta.env.VITE_API_URL}/restaurant/${pathId}/edit`,
+        `${
+          import.meta.env.VITE_API_URL
+        }/restaurant/65a602bba37b675e7235694f/edit`,
         "POST",
-        {
-          // add user info in req body
-          name: form.values.name,
-          image: form.values.image,
-          category: form.values.category,
-          location: form.values.location,
-          timeOpen: parseInt(form.values.timeOpen.split(":").join("")),
-          timeClose: parseInt(form.values.timeClose.split(":").join("")),
-          address: form.values.address,
-          daysClose: form.values.daysClose,
-          phone: form.values.phone,
-          websiteUrl: form.values.websiteUrl,
-          maxPax: form.values.maxPax,
-          description: form.values.description,
-        }
+        payload
       );
       console.log(res);
       navigate("/owner/restaurant");
@@ -156,38 +140,47 @@ function EditRestaurant() {
     </ActionIcon>
   );
 
-  const modalContent = (form) => {
-    //   form.forEach(function(key, val){
-    //     if (key === ) {
-    //         console.log(idx + ' - ' + m);
-    //     }
-    // })
-    const restDetails = {
-      // add user info in req body
-      Name: form.values.name,
-      Category: form.values.category,
-      Address: form.values.address,
-      Location: form.values.location,
-      OpeningHours:
-        form.values.timeClose && form.values.timeOpen
-          ? `${form.values.timeOpen} - ${form.values.timeClose}`
-          : "No opening hours specified",
-      DaysClosed: form.values.daysClose
-        ? form.values.daysClose
-        : "No rest days specified",
-      Phone: form.values.phone ? form.values.phone : "No phone number provided",
-      MaximumPax: form.values.maxPax,
+  const confirmInput = (input) => {
+    const formSubmit = {
+      name: input.name,
+      image: input.image,
+      category: input.category,
+      location: input.location,
+      timeOpen: parseInt(input.timeOpen.split(":").join("")),
+      timeClose: parseInt(input.timeClose.split(":").join("")),
+      address: input.address,
+      daysClose: input.daysClose,
+      phone: input.phone,
+      websiteUrl: input.websiteUrl,
+      maxPax: input.maxPax,
+      description: input.description,
     };
+    setPayload(formSubmit);
+  };
 
-    return (
-      <ul>
-        {Object.entries(restDetails).map(([key, val]) => (
-          <li key={key}>
-            {key}: {val}
-          </li>
-        ))}
-      </ul>
-    );
+  // get user edited info
+  const compareData = (var1, var2) => {
+    const displayData = {};
+
+    Object.keys(var1).forEach((key) => {
+      if (var2.hasOwnProperty(key) && var1[key] !== var2[key]) {
+        displayData[key] = var1[key];
+      }
+    });
+
+    if (Object.keys(displayData).length === 0) {
+      return "No differing values. Pls update the relevant fields.";
+    } else {
+      return (
+        <ul>
+          {Object.entries(displayData).map(([key, value]) => (
+            <li key={key}>
+              {key}: {value}
+            </li>
+          ))}
+        </ul>
+      );
+    }
   };
 
   return (
@@ -199,6 +192,7 @@ function EditRestaurant() {
         <form
           onSubmit={form.onSubmit(() => {
             if (form.isValid) {
+              confirmInput(form.values);
               toggle();
             }
           })}
@@ -317,11 +311,10 @@ function EditRestaurant() {
           </Group>
         </form>
 
-        {/* Modal */}
         <Modal
           opened={opened}
           title="Update Restaurant"
-          modalContent={modalContent(form)}
+          modalContent={compareData(payload, data)}
           toggle={toggle}
           close={close}
           handleSubmit={handleSubmit}
