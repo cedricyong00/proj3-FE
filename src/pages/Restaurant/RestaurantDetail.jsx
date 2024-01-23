@@ -1,10 +1,19 @@
 import { Link, useLocation } from "react-router-dom";
-import { Flex, Button, Stack, Image, Text } from "@mantine/core";
+import {
+  Button,
+  Image,
+  Text,
+  Title,
+  Box,
+  Anchor,
+  useMantineTheme,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import classes from "./RestaurantList.module.css";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import useCheckBooking from "../../hooks/useCheckBooking";
+import { useMediaQuery } from "@mantine/hooks";
 
 function RestaurantDetail() {
   const { sendRequest } = useFetch();
@@ -13,6 +22,8 @@ function RestaurantDetail() {
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
   const { formatTime } = useCheckBooking();
+  const theme = useMantineTheme();
+  const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
 
   useEffect(() => {
     getData();
@@ -25,35 +36,21 @@ function RestaurantDetail() {
         `${import.meta.env.VITE_API_URL}/restaurant/${pathId}`,
         "GET"
       );
-      setData(resData);
+      const formattedTimeOpen = resData.timeOpen
+        ? formatTime(resData.timeOpen)
+        : null;
+      const formattedTimeClose = resData.timeClose
+        ? formatTime(resData.timeClose)
+        : null;
+      setData({
+        ...resData,
+        timeOpen: formattedTimeOpen,
+        timeClose: formattedTimeClose,
+      });
     } catch (err) {
       console.log(err);
     }
     setLoading(false);
-  };
-
-  const restDetails = (detail) => {
-    const restDeets = {
-      // add user info in req body
-      Category: detail.category,
-      Location: detail.location,
-      Address: detail.address,
-      "Opening Hours": `${formatTime(detail.timeOpen)} - ${formatTime(
-        detail.timeClose
-      )}`,
-      "Days Closed": detail.daysClose
-        ? detail.daysClose
-        : "No rest days specified",
-      Phone: detail.phone ? detail.phone : "No phone number provided",
-      Website: detail.websiteURL ? detail.websiteURL : "-",
-      "Maximum Pax": detail.maxPax ? detail.maxPax : "-",
-    };
-
-    return Object.entries(restDeets).map(([key, val]) => (
-      <p key={key}>
-        {key}: {val}
-      </p>
-    ));
   };
 
   return (
@@ -62,41 +59,58 @@ function RestaurantDetail() {
         <LoadingSpinner />
       ) : (
         <>
-          <Stack ta="center">
-            <Flex
-              gap="md"
-              justify="center"
-              align="center"
-              direction="column"
-              wrap="wrap"
-            >
-              <h2>{data.name}</h2>
+          <Box w={isPc ? "80%" : "100%"} mx="auto">
+            <Title order={2} ta="center">
+              {data.name}
+            </Title>
+            {data.image && (
               <Image
                 src={data.image}
-                alt="no image available"
+                alt={data.name}
                 className={classes.image}
-                w="80%"
-                h="50%"
+                w="100%"
+                h="auto"
+                mt="lg"
+                radius="md"
               ></Image>
+            )}
+
+            <Box mt="xl" mx="auto" ta="center">
               <Button
-                mt="sm"
                 component={Link}
                 to={`/restaurant/${data._id}/new-booking`}
               >
                 Reserve a table
               </Button>
-              <Flex w="80%">
-                <Text ta="left">
-                  <p>{restDetails(data)}</p>
-                  <p>
-                    <br />
-                    Description: <br />
-                    {data.description}
-                  </p>
-                </Text>
-              </Flex>
-            </Flex>
-          </Stack>
+            </Box>
+
+            <Text mt="xl">Category: {data.category}</Text>
+            <Text>Location: {data.location}</Text>
+            <Text>Address: {data.address}</Text>
+            <Text>
+              Opening Hours: {data.timeOpen} - {data.timeClose}
+            </Text>
+            <Text>
+              Days Closed:{" "}
+              {data?.daysClose?.length > 0 ? data.daysClose.join(", ") : "-"}
+            </Text>
+            <Text>Phone: {data.phone ? data.phone : "-"}</Text>
+            <Text>
+              Website:{" "}
+              {data.websiteUrl ? (
+                <Anchor href={data.websiteUrl} target="_blank">
+                  {data.websiteUrl}
+                </Anchor>
+              ) : (
+                "-"
+              )}
+            </Text>
+            <Text mt="lg">
+              Description:
+              <br />
+              {data.description ? data.description : "-"}
+            </Text>
+          </Box>
         </>
       )}
     </>
