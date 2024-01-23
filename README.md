@@ -14,6 +14,10 @@ https://front-end-ftue.onrender.com/
 * Frontend Application https://github.com/cedricyong00/proj3-FE
 
 ## Screenshots
+<img width="1375" alt="Screenshot 2024-01-24 at 12 10 56 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/ae27b42c-9f24-472c-920f-ab1c58855927">
+<img width="1388" alt="Screenshot 2024-01-24 at 12 12 25 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/8f2c34a0-db4b-4366-8721-e98e50c5a982">
+<img width="1388" alt="Screenshot 2024-01-24 at 12 12 50 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/fc18ca3c-6d92-4baf-b368-044300127991">
+<img width="1388" alt="Screenshot 2024-01-24 at 12 13 23 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/d06dd54f-8894-4f31-861f-aed632441323">
 
 ## Technologies Used
 ### Backend API/DB
