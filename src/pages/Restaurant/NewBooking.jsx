@@ -11,7 +11,12 @@ import {
 import { DateInput, TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useOutletContext,
+} from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
@@ -24,9 +29,7 @@ import useCheckBooking from "../../hooks/useCheckBooking";
 
 function NewBooking() {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [opened, { toggle, close }] = useDisclosure(false);
-  const navigate = useNavigate();
   const { sendRequest } = useFetch();
   const location = useLocation();
   const pathId = location.pathname.split("/")[2];
@@ -36,11 +39,19 @@ function NewBooking() {
   const { isInputDayClosed, formatTime } = useCheckBooking();
   const [isDayClosed, setIsDayClosed] = useState(false);
   const [operationHours, setOperationHours] = useState({});
+  const { user } = useOutletContext();
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    // setLoading(true);
     getData();
+    if (!user) {
+      navigate("/signin");
+      return;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [data.timeOpen, data.timeClose]);
 
   const getData = async () => {
     try {
@@ -49,6 +60,12 @@ function NewBooking() {
         "GET"
       );
       setData(resData);
+      if (data?.timeOpen && data?.timeClose) {
+        setOperationHours({
+          timeOpen: formatTime(data.timeOpen),
+          timeClose: formatTime(data.timeClose),
+        });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -90,15 +107,6 @@ function NewBooking() {
         value?.length > 100 && "Please enter less than 100 characters",
     },
   });
-
-  useEffect(() => {
-    if (data?.timeOpen && data?.timeClose) {
-      setOperationHours({
-        timeOpen: formatTime(data.timeOpen),
-        timeClose: formatTime(data.timeClose),
-      });
-    }
-  }, [data.timeOpen, data.timeClose, form.values.time, formatTime]);
 
   useEffect(() => {
     if (data?.daysClose) {
