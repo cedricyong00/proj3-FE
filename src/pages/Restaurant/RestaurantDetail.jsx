@@ -1,8 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { Flex, Button, Stack, Box, Image } from "@mantine/core";
+import { Flex, Button, Stack, Image } from "@mantine/core";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
-import dayjs from "dayjs";
 import classes from "./RestaurantList.module.css";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import useCheckBooking from "../../hooks/useCheckBooking";

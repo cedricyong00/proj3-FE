@@ -57,6 +57,7 @@ function NewRestaurant() {
   });
 
   const handleSubmit = async () => {
+    console.log(form);
     try {
       const res = await sendRequest(
         `${import.meta.env.VITE_API_URL}/restaurant/create`,
@@ -272,7 +273,6 @@ function NewRestaurant() {
           </Group>
         </form>
 
-        {/* Modal */}
         <Modal
           opened={opened}
           title="Create Your Restaurant"
