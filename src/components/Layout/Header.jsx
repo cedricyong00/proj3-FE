@@ -73,7 +73,7 @@ export const Header = ({ user, setUser }) => {
             location.pathname !== "/signin" &&
             location.pathname !== "/signup" && (
               <Group visibleFrom="sm">
-                <Button variant="default" component={Link} to="/signin">
+                <Button variant="outline" component={Link} to="/signin">
                   Log in
                 </Button>
                 <Button component={Link} to="/signup">
