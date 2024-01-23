@@ -69,8 +69,7 @@ function EditRestaurant() {
 
   const getData = async () => {
     const resData = await sendRequest(
-      // `${import.meta.env.VITE_API_URL}/restaurant/${pathId}`,
-      `${import.meta.env.VITE_API_URL}/restaurant/65a602bba37b675e7235694f`,
+      `${import.meta.env.VITE_API_URL}/restaurant/${pathId}`,
       "GET"
     );
     setLoading(false);
@@ -94,10 +93,7 @@ function EditRestaurant() {
   const handleSubmit = async () => {
     try {
       const res = await sendRequest(
-        // `${import.meta.env.VITE_API_URL}/restaurant/${pathId}/edit`,
-        `${
-          import.meta.env.VITE_API_URL
-        }/restaurant/65a602bba37b675e7235694f/edit`,
+        `${import.meta.env.VITE_API_URL}/restaurant/${pathId}/edit`,
         "POST",
         payload
       );
