@@ -8,7 +8,6 @@ import {
   Anchor,
   useMantineTheme,
 } from "@mantine/core";
-import { Flex, Button, Stack, Image } from "@mantine/core";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
 import classes from "./RestaurantList.module.css";
