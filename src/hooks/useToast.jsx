@@ -9,7 +9,16 @@ function useToast() {
     });
   };
 
-  const errorToast = () => {
+  const errorToast = (err) => {
+    if (err) {
+      notifications.show({
+        title: err,
+        message: "Please try again",
+        autoClose: 5000,
+        color: "red",
+      });
+      return;
+    }
     notifications.show({
       title: "Something went wrong!",
       message: "Please try again later",

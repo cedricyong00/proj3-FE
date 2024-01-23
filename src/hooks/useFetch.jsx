@@ -1,3 +1,5 @@
+import { getToken } from "../util/security";
+
 function useFetch() {
   const sendRequest = async (url, method, payload) => {
     const options = { method };
@@ -6,12 +8,11 @@ function useFetch() {
       options.body = JSON.stringify(payload);
     }
 
-    // TODO
-    // const token = getToken();
-    // if (token) {
-    //   options.headers = options.headers || {};
-    //   options.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = getToken();
+    if (token) {
+      options.headers = options.headers || {};
+      options.headers.Authorization = `Bearer ${token}`;
+    }
 
     try {
       const res = await fetch(url, options);
