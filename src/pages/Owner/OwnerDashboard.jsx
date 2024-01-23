@@ -1,13 +1,23 @@
 /* eslint-disable react/prop-types */
-import { Table, ScrollArea, Text, Button, Anchor } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import { useEffect, useState } from "react";
+import {
+  Table,
+  ScrollArea,
+  Group,
+  Text,
+  Button,
+  ActionIcon,
+  rem,
+  useMantineTheme,
+} from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
+import { DatePickerInput, TimeInput } from "@mantine/dates";
+import { useEffect, useRef, useState } from "react";
+import { IconClock } from "@tabler/icons-react";
 import dayjs from "dayjs";
-import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
-import useToast from "../../hooks/useToast";
+import { useForm } from "@mantine/form";
+import { useNavigate, useOutletContext } from "react-router-dom";
 
 function Th({ children }) {
   return (
@@ -19,18 +29,47 @@ function Th({ children }) {
   );
 }
 
-function BookingList() {
-  const [opened, { toggle, close }] = useDisclosure(false);
+function OwnerDashboard() {
   const [data, setData] = useState([]);
-  const [dataToCancel, setDataToCancel] = useState([]);
-  const { sendRequest } = useFetch();
-  const { successToast, errorToast } = useToast();
-  const { user } = useOutletContext();
   const [loading, setLoading] = useState(true);
+  const { sendRequest } = useFetch();
+  const { user } = useOutletContext();
   const navigate = useNavigate();
 
+  const theme = useMantineTheme();
+  const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
+
+  const form = useForm({
+    initialValues: {
+      date: null,
+      timeFrom: "",
+      timeTo: "",
+    },
+    initialErrors: { timeFrom: null, timeTo: null },
+    validate: {
+      date: (value) => !value && "Please enter a date",
+      timeFrom: (value) =>
+        value === ""
+          ? null
+          : value > form.values.timeTo
+          ? "Invalid time range"
+          : value && !form.values.timeTo
+          ? "Invalid time range"
+          : !value && form.values.timeTo && "Invalid time range",
+
+      timeTo: (value) =>
+        value === ""
+          ? null
+          : value < form.values.timeFrom
+          ? "Invalid time range"
+          : value && !form.values.timeFrom
+          ? "Invalid time range"
+          : !value && form.values.timeFrom && "Invalid time range",
+    },
+  });
+
   useEffect(() => {
-    getList();
+    getInitialList();
     if (!user) {
       navigate("/signin");
       return;
@@ -38,121 +77,166 @@ function BookingList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getList = async () => {
+  const getInitialList = async () => {
     const resData = await sendRequest(
-      `${import.meta.env.VITE_API_URL}/booking`,
+      `${import.meta.env.VITE_API_URL}/booking/restaurant`,
       "GET"
     );
     setData(resData);
     setLoading(false);
   };
 
-  const handleSubmit = async () => {
-    try {
-      await sendRequest(
-        `${import.meta.env.VITE_API_URL}/booking/${dataToCancel._id}/`,
-        "DELETE"
-      );
-      setData((prev) =>
-        prev.filter((booking) => booking._id !== dataToCancel._id)
-      );
-      close();
-      successToast({
-        title: "Table canceled!",
-        message: "You will receive a confirmation email shortly",
-      });
-    } catch (err) {
-      console.log(err);
-      close();
-      errorToast();
+  const handleClearFilter = () => {
+    form.reset();
+    setLoading(true);
+    getInitialList();
+  };
+
+  const filterList = async () => {
+    setLoading(true);
+    let startDateTime;
+    let endDateTime;
+
+    if (!form.values.timeFrom && !form.values.timeTo) {
+      startDateTime = dayjs(form.values.date).startOf("day").format();
+      endDateTime = dayjs(form.values.date).endOf("day").format();
+    } else {
+      startDateTime = dayjs(form.values.date)
+        .hour(parseInt(form.values.timeFrom.split(":")[0]))
+        .minute(parseInt(form.values.timeFrom.split(":")[1]))
+        .second(0)
+        .format();
+      endDateTime = dayjs(form.values.date)
+        .hour(parseInt(form.values.timeTo.split(":")[0]))
+        .minute(parseInt(form.values.timeTo.split(":")[1]))
+        .second(59)
+        .format();
     }
+
+    const encodedStartDateTime = encodeURIComponent(startDateTime);
+    const encodedEndDateTime = encodeURIComponent(endDateTime);
+
+    const resData = await sendRequest(
+      `${
+        import.meta.env.VITE_API_URL
+      }/booking/restaurant?startDateTime=${encodedStartDateTime}&endDateTime=${encodedEndDateTime}`,
+      "GET"
+    );
+    setData(resData);
+    setLoading(false);
   };
 
   const rows = data.map((row) => (
     <Table.Tr key={row._id}>
-      <Table.Td>
-        <Anchor component={Link} to={`/restaurant/${row.restaurant._id}`}>
-          {row.restaurant.name ? row.restaurant.name : "Restaurant Name"}
-        </Anchor>
-      </Table.Td>
-
+      {/* TODO */}
+      <Table.Td>Natsumi Hori</Table.Td>
       <Table.Td>{dayjs(row.dateTime).format("DD/MM/YYYY")}</Table.Td>
       <Table.Td>{dayjs(row.dateTime).format("hh:mmA")}</Table.Td>
       <Table.Td>{row.pax}</Table.Td>
-      <Table.Td>{row.request}</Table.Td>
-
-      <Table.Td w="85px">
-        <Button
-          variant="outline"
-          onClick={() => {
-            toggle();
-            setDataToCancel(row);
-          }}
-        >
-          Cancel
-        </Button>
-      </Table.Td>
-      <Table.Td w="85px">
-        <Button component={Link} to={`/booking/${row._id}/edit`}>
-          Edit
-        </Button>
-      </Table.Td>
+      <Table.Td>{row.request && row.request}</Table.Td>
+      {/* TODO */}
+      <Table.Td>email@email.cpm</Table.Td>
     </Table.Tr>
   ));
 
-  const modalContent = (
-    <ul>
-      <li>Date: {dayjs(dataToCancel.dateTime).format("DD/MM/YYYY")}</li>
-      <li>Time: {dayjs(dataToCancel.dateTime).format("hh:mmA")}</li>
-      <li>Table for: {dataToCancel.pax}</li>
-      <li>
-        Special Request:
-        {dataToCancel.request ? dataToCancel.request : "None"}
-      </li>
-    </ul>
+  const refFrom = useRef(null);
+  const refTo = useRef(null);
+
+  const pickerControlFrom = (
+    <ActionIcon
+      variant="subtle"
+      color="gray"
+      onClick={() => refFrom.current?.showPicker()}
+    >
+      <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+    </ActionIcon>
+  );
+  const pickerControlTo = (
+    <ActionIcon
+      variant="subtle"
+      color="gray"
+      onClick={() => refTo.current?.showPicker()}
+    >
+      <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
+    </ActionIcon>
   );
 
   return (
     <>
+      <form
+        onSubmit={form.onSubmit(() => {
+          filterList();
+        })}
+      >
+        <Group align="flex-start" mb="xl">
+          <DatePickerInput
+            label="Date"
+            placeholder="Pick date"
+            miw={!isPc ? "calc(50% - 12px)" : "150px"}
+            {...form.getInputProps("date")}
+          />
+          <TimeInput
+            label="Time From"
+            ref={refFrom}
+            rightSection={pickerControlFrom}
+            miw={!isPc ? "calc(50% - 12px)" : "150px"}
+            {...form.getInputProps("timeFrom")}
+          />
+          <TimeInput
+            label="Time To"
+            ref={refTo}
+            rightSection={pickerControlTo}
+            miw={!isPc ? "calc(50% - 12px)" : "150px"}
+            {...form.getInputProps("timeTo")}
+          />
+          <Button type="submit" mt="25px">
+            Filter
+          </Button>
+          <Button
+            mt="25px"
+            variant="outline"
+            onClick={handleClearFilter}
+            disabled={!form.isDirty()}
+          >
+            Clear
+          </Button>
+        </Group>
+      </form>
       {loading ? (
         <LoadingSpinner />
       ) : rows.length === 0 ? (
         <Text fw={500} ta="center">
           You have no bookings yet. <br />
-          <Anchor component={Link} to="/">
-            Book a table now!
-          </Anchor>
         </Text>
       ) : (
         <>
-          <ScrollArea>
-            <Table verticalSpacing="xs" miw={700}>
+          <ScrollArea mt="xl">
+            <Table verticalSpacing="md" miw={700}>
               <Table.Tbody>
                 <Table.Tr>
-                  <Th>Restaurant</Th>
+                  <Th>Name</Th>
                   <Th>Date</Th>
                   <Th>Time</Th>
                   <Th>Pax</Th>
                   <Th>Request</Th>
+                  <Th>Email</Th>
                 </Table.Tr>
               </Table.Tbody>
-              <Table.Tbody>{rows}</Table.Tbody>
+              <Table.Tbody>
+                {rows.length > 0 ? (
+                  rows
+                ) : (
+                  <Text fw={500} ta="center">
+                    Nothing found
+                  </Text>
+                )}
+              </Table.Tbody>
             </Table>
           </ScrollArea>
-
-          {/* Modal */}
-          <Modal
-            opened={opened}
-            title="Cancel a table reservation"
-            modalContent={modalContent}
-            toggle={toggle}
-            close={close}
-            handleSubmit={handleSubmit}
-          />
         </>
       )}
     </>
   );
 }
 
-export default BookingList;
+export default OwnerDashboard;
