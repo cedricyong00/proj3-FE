@@ -63,7 +63,7 @@ function RestaurantList() {
 
           <Flex
             gap="xl"
-            justify="space-between"
+            justify="flex-start"
             align="stretch"
             wrap="wrap"
             mt="xl"
