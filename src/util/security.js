@@ -29,6 +29,10 @@ export function hashDataWithSaltRounds(data, salt, iterations) {
   }).toString(CryptoJS.enc.Base64);
 }
 
+export function storeToken(token) {
+  localStorage.setItem("token", token);
+}
+
 export function getToken() {
   const token = localStorage.getItem("token");
   if (!token) return null;

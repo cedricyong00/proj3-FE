@@ -113,7 +113,7 @@ function SignUpPage() {
           {/* IsOwner */}
           <Group justify="space-between" mt="lg">
             <Checkbox
-              label="I am a owner of restaurant"
+              label="I am an owner of restaurant"
               checked={isOwner}
               onChange={() => {
                 setIsOwner((prev) => !prev);

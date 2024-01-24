@@ -36,7 +36,7 @@ export const Header = ({ user, setUser }) => {
   const { successToast } = useToast();
 
   const handleLogout = () => {
-    // TODO: Logout user
+    // TODO: send logout req to user api
     setUser(null);
     navigate("/");
     successToast({
