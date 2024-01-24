@@ -36,7 +36,7 @@ function EditRestaurant() {
   const { formatTime } = useCheckBooking();
   dayjs.extend(customParseFormat);
   // dummy
-  const pathId = "65ae30ad517a5390a35bf598";
+  const pathId = "65a7a95c62474ec1a8470552";
 
   useEffect(() => {
     getData();
