@@ -3,19 +3,20 @@ import { Header } from "./Header";
 import { Container, Flex } from "@mantine/core";
 import { Footer } from "./Footer";
 import { useState } from "react";
-// import { getUser } from "../../service/users";
+import { getUser } from "../../service/users";
 
 export const Layout = () => {
+  const [user, setUser] = useState(getUser());
+  // TODO: to be removed after implementing user api
   // dummy user
-  const [user, setUser] = useState({
-    id: 1,
-    name: "John Doe",
-    email: "email@email.com",
-    isOwner: true,
-  });
+  // const [user, setUser] = useState({
+  //   id: 1,
+  //   name: "John Doe",
+  //   email: "email@email.com",
+  //   isOwner: true,
+  // });
   // const [user, setUser] = useState(null);
   // JWT token's payload
-  // const [user, setUser] = useState(getUser());
 
   return (
     <Flex
