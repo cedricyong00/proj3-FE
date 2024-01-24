@@ -36,7 +36,7 @@ export const Header = ({ user, setUser }) => {
   const { successToast } = useToast();
 
   const handleLogout = () => {
-    // TODO: Logout user
+    // TODO: send logout req to user api
     setUser(null);
     navigate("/");
     successToast({
@@ -73,7 +73,7 @@ export const Header = ({ user, setUser }) => {
             location.pathname !== "/signin" &&
             location.pathname !== "/signup" && (
               <Group visibleFrom="sm">
-                <Button variant="default" component={Link} to="/signin">
+                <Button variant="outline" component={Link} to="/signin">
                   Log in
                 </Button>
                 <Button component={Link} to="/signup">
