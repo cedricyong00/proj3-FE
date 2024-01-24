@@ -6,15 +6,16 @@ import { useDisclosure } from "@mantine/hooks";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import Modal from "../../components/Parts/Modal";
 import useCheckBooking from "../../hooks/useCheckBooking";
+import useToast from "../../hooks/useToast";
 
 function RestaurantInfo() {
   const { sendRequest } = useFetch();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [opened, { toggle, close }] = useDisclosure(false);
+  const { successToast, errorToast } = useToast();
   const location = useLocation();
-  // const pathId = location.pathname.split("/")[2];
-  const pathId = "65b10ece45fa2db5554d93c5";
+  const pathId = location.pathname.split("/")[2];
   const { formatTime } = useCheckBooking();
 
   useEffect(() => {
