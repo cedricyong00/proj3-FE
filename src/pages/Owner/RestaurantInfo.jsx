@@ -1,8 +1,17 @@
-import { Link, useLocation } from "react-router-dom";
-import { Flex, Button, Stack, Box, Text } from "@mantine/core";
+import { Link } from "react-router-dom";
+import {
+  Flex,
+  Button,
+  Box,
+  Text,
+  Anchor,
+  Title,
+  Image,
+  useMantineTheme,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 import useFetch from "../../hooks/useFetch";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import Modal from "../../components/Parts/Modal";
 import useCheckBooking from "../../hooks/useCheckBooking";
@@ -14,9 +23,9 @@ function RestaurantInfo() {
   const [loading, setLoading] = useState(true);
   const [opened, { toggle, close }] = useDisclosure(false);
   const { successToast, errorToast } = useToast();
-  const location = useLocation();
-  const pathId = location.pathname.split("/")[2];
   const { formatTime } = useCheckBooking();
+  const theme = useMantineTheme();
+  const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
 
   useEffect(() => {
     getData();
@@ -26,45 +35,33 @@ function RestaurantInfo() {
   const getData = async () => {
     try {
       const resData = await sendRequest(
-        `${import.meta.env.VITE_API_URL}/restaurant/${pathId}`,
+        `${import.meta.env.VITE_API_URL}/restaurant/user`,
         "GET"
       );
-      setData(resData);
+      const formattedTimeOpen = resData.timeOpen
+        ? formatTime(resData.timeOpen)
+        : null;
+      const formattedTimeClose = resData.timeClose
+        ? formatTime(resData.timeClose)
+        : null;
+      setData({
+        ...resData,
+        timeOpen: formattedTimeOpen,
+        timeClose: formattedTimeClose,
+      });
     } catch (err) {
       console.log(err);
     }
     setLoading(false);
   };
 
-  const restDetails = (detail) => {
-    const restDeets = {
-      // add user info in req body
-      Category: detail.category,
-      Location: detail.location,
-      Address: detail.address,
-      "Time Opened": formatTime(detail.timeOpen),
-      "Time Closed": formatTime(detail.timeClose),
-      "Days Closed": detail.daysClose
-        ? detail.daysClose
-        : "No rest days specified",
-      Phone: detail.phone ? detail.phone : "No phone number provided",
-      Website: detail.websiteURL,
-      "Maximum Pax": detail.maxPax ? detail.maxPax : "-",
-    };
-
-    return Object.entries(restDeets).map(([key, val]) => (
-      <p key={key}>
-        {key}: {val}
-      </p>
-    ));
-  };
-
   const handleDelData = async () => {
     try {
       await sendRequest(
-        `${import.meta.env.VITE_API_URL}/restaurant/${pathId}/delete`,
+        `${import.meta.env.VITE_API_URL}/restaurant/${data._id}/delete`,
         "DELETE"
       );
+      setData([]);
       close();
       successToast({
         title: "Restaurant Info Successfully Deleted",
@@ -83,51 +80,81 @@ function RestaurantInfo() {
     <>
       {loading ? (
         <LoadingSpinner />
+      ) : data.length === 0 ? (
+        <Box w="100%" h="100%" mt="xl">
+          <Text ta="center">You have not created any restaurant yet!</Text>
+          <Box mt="xl" ta="center">
+            <Button component={Link} to="/owner/restaurant/new">
+              Create a new restaurant
+            </Button>
+          </Box>
+        </Box>
       ) : (
         <>
-          <Box maw={500} mx="auto" mt="xl">
-            <Stack ta="center">
-              <h2>{data.name}</h2>
-
-              <Flex
-                gap="md"
-                justify="center"
-                align="center"
-                direction="column"
-                wrap="wrap"
+          <Box w={isPc ? "80%" : "100%"} mx="auto">
+            <Title order={2} ta="center">
+              {data.name}
+            </Title>
+            {data.image && (
+              <Image
+                src={data.image}
+                alt={data.name}
                 w="100%"
-                h="100%"
-              >
-                {/* <Text align="center" /> */}
-                <p>{restDetails(data)}</p>
-                <p>{data.description}</p>
-                <Flex
-                  direction="row"
-                  gap="md"
-                  justify="center"
-                  align="flex-start"
-                  wrap="wrap"
-                  w="100%"
-                  h="100%"
-                >
-                  <Button
-                    mt="sm"
-                    onClick={toggle}
-                    // onClick={() => form.initialize({ name: "John", age: 20 })}
-                  >
-                    Delete
-                  </Button>
-                  <Button
-                    mt="sm"
-                    component={Link}
-                    to={`/owner/restaurant/edit`}
-                  >
-                    Edit
-                  </Button>
-                </Flex>
-              </Flex>
-            </Stack>
+                h="auto"
+                mt="lg"
+                radius="md"
+              ></Image>
+            )}
+
+            <Box w={isPc ? "70%" : "100%"} mx="auto">
+              <Text mt="xl">Category: {data.category}</Text>
+              <Text>Location: {data.location}</Text>
+              <Text>Address: {data.address}</Text>
+              <Text>
+                Opening Hours: {data.timeOpen} - {data.timeClose}
+              </Text>
+              <Text>
+                Days Closed:{" "}
+                {data?.daysClose?.length > 0 ? data.daysClose.join(", ") : "-"}
+              </Text>
+              <Text>Phone: {data.phone ? data.phone : "-"}</Text>
+              <Text>
+                Website:{" "}
+                {data.websiteUrl ? (
+                  <Anchor href={data.websiteUrl} target="_blank">
+                    {data.websiteUrl}
+                  </Anchor>
+                ) : (
+                  "-"
+                )}
+              </Text>
+              <Text mt="lg">
+                Description:
+                <br />
+                {data.description ? data.description : "-"}
+              </Text>
+            </Box>
+
+            <Flex
+              direction="row"
+              gap="md"
+              justify="center"
+              align="flex-start"
+              wrap="wrap"
+              w="100%"
+              h="100%"
+              mt="xl"
+            >
+              <Button mt="sm" onClick={toggle} variant="outline">
+                Delete
+              </Button>
+              <Button mt="sm" component={Link} to={"/owner/restaurant/edit"}>
+                Edit
+              </Button>
+            </Flex>
           </Box>
+
+          {/* Modal */}
           <Modal
             opened={opened}
             title="Delete Restaurant"
