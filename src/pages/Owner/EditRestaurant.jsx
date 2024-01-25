@@ -35,8 +35,6 @@ function EditRestaurant() {
   const [loading, setLoading] = useState(true);
   const { formatTime } = useCheckBooking();
   dayjs.extend(customParseFormat);
-  // dummy
-  const pathId = "65ae30ad517a5390a35bf598";
 
   useEffect(() => {
     getData();
@@ -73,7 +71,7 @@ function EditRestaurant() {
 
   const getData = async () => {
     const resData = await sendRequest(
-      `${import.meta.env.VITE_API_URL}/restaurant/${pathId}`,
+      `${import.meta.env.VITE_API_URL}/restaurant/user`,
       "GET"
     );
     setLoading(false);
@@ -97,7 +95,7 @@ function EditRestaurant() {
   const handleSubmit = async () => {
     try {
       const res = await sendRequest(
-        `${import.meta.env.VITE_API_URL}/restaurant/${pathId}/edit`,
+        `${import.meta.env.VITE_API_URL}/restaurant/${data._id}/edit`,
         "POST",
         payload
       );
