@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import cx from "clsx";
 import { useState } from "react";
@@ -27,7 +29,9 @@ import classes from "./HeaderTabs.module.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo-new.png";
 import useToast from "../../hooks/useToast";
-import { logOut } from "../../service/users";
+import { getUser } from "../../service/users";
+import useFetch from "../../hooks/useFetch";
+import { removeToken } from "../../util/security";
 
 export const Header = ({ user, setUser }) => {
   const theme = useMantineTheme();
@@ -36,6 +40,26 @@ export const Header = ({ user, setUser }) => {
   const navigate = useNavigate();
   const { successToast } = useToast();
 
+  // Logout function
+  async function logOut(token, userData) {
+    const userInfo = getUser();
+    const { sendRequest } = useFetch();
+    const logoutURL = `${import.meta.env.VITE_API_URL}/logout`;
+    if (token) {
+      // send request
+      const res = await sendRequest(
+        logoutURL,
+        "POST",
+        userInfo.email
+      );
+      removeToken();
+      console.log(userInfo.email)
+      window.location.reload();
+      return res;
+    }
+    return true;
+  }
+  
   const handleLogout = () => {
     // TODO: send logout req to user api
     setUser(null);

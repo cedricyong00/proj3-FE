@@ -90,9 +90,6 @@ function Account() {
             >
               See Bookings
             </Button>
-            <Button onClick={logOut}>
-              Logout
-            </Button>
           </div>
         </>
       )}
