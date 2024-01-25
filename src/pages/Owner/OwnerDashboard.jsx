@@ -163,7 +163,7 @@ function OwnerDashboard() {
   return (
     <>
       <Title order={2} ta="center" mb="lg">
-        Your Gests
+        Your Guests
       </Title>
       {loading ? (
         <LoadingSpinner />
