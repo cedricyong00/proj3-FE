@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import {
   Flex,
   Button,
@@ -26,9 +26,15 @@ function RestaurantInfo() {
   const { formatTime } = useCheckBooking();
   const theme = useMantineTheme();
   const isPc = useMediaQuery(`(min-width: ${theme.breakpoints.xs})`);
+  const { user } = useOutletContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
+    if (!user || !user.isOwner) {
+      navigate("/signin");
+      return;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

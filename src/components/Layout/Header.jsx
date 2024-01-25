@@ -27,6 +27,7 @@ import classes from "./HeaderTabs.module.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo-new.png";
 import useToast from "../../hooks/useToast";
+import { logOut } from "../../service/users";
 
 export const Header = ({ user, setUser }) => {
   const theme = useMantineTheme();
@@ -38,6 +39,7 @@ export const Header = ({ user, setUser }) => {
   const handleLogout = () => {
     // TODO: send logout req to user api
     setUser(null);
+    logOut();
     navigate("/");
     successToast({
       title: "See you again!",
@@ -72,7 +74,7 @@ export const Header = ({ user, setUser }) => {
           {!user &&
             location.pathname !== "/signin" &&
             location.pathname !== "/signup" && (
-              <Group visibleFrom="sm">
+              <Group>
                 <Button variant="outline" component={Link} to="/signin">
                   Log in
                 </Button>
@@ -137,7 +139,7 @@ export const Header = ({ user, setUser }) => {
                         />
                       }
                     >
-                      Your Bookings (For Owner)
+                      Your Guests
                     </Menu.Item>
                     <Menu.Item
                       component={Link}

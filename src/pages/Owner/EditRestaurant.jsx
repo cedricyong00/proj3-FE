@@ -15,7 +15,7 @@ import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
 import { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useDisclosure } from "@mantine/hooks";
@@ -35,11 +35,7 @@ function EditRestaurant() {
   const [loading, setLoading] = useState(true);
   const { formatTime } = useCheckBooking();
   dayjs.extend(customParseFormat);
-
-  useEffect(() => {
-    getData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const { user } = useOutletContext();
 
   const form = useForm({
     validate: {
@@ -69,28 +65,40 @@ function EditRestaurant() {
     },
   });
 
-  const getData = async () => {
-    const resData = await sendRequest(
-      `${import.meta.env.VITE_API_URL}/restaurant/user`,
-      "GET"
-    );
-    setLoading(false);
-    setData(resData);
-    form.setValues({
-      name: resData.name,
-      image: resData.image,
-      category: resData.category,
-      location: resData.location,
-      timeOpen: formatTime(resData.timeOpen),
-      timeClose: formatTime(resData.timeClose),
-      address: resData.address,
-      daysClose: resData.daysClose,
-      phone: resData.phone,
-      websiteUrl: resData.websiteUrl,
-      maxPax: resData.maxPax,
-      description: resData.description,
-    });
-  };
+  useEffect(() => {
+    if (!user || !user.isOwner) {
+      navigate("/signin");
+      return;
+    }
+    const getData = async () => {
+      const resData = await sendRequest(
+        `${import.meta.env.VITE_API_URL}/restaurant/user`,
+        "GET"
+      );
+      if (!resData || resData.length === 0) {
+        navigate("/owner/restaurant");
+        return;
+      }
+      setLoading(false);
+      setData(resData);
+      form.setValues({
+        name: resData.name,
+        image: resData.image,
+        category: resData.category,
+        location: resData.location,
+        timeOpen: formatTime(resData.timeOpen),
+        timeClose: formatTime(resData.timeClose),
+        address: resData.address,
+        daysClose: resData.daysClose,
+        phone: resData.phone,
+        websiteUrl: resData.websiteUrl,
+        maxPax: resData.maxPax,
+        description: resData.description,
+      });
+    };
+    getData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmit = async () => {
     try {
@@ -193,7 +201,7 @@ function EditRestaurant() {
           <Title order={2} ta="center">
             Update Your Restaurant
           </Title>
-          <Box maw={340} mx="auto" mt="xl">
+          <Box maw={500} mx="auto" mt="xl">
             <form
               onSubmit={form.onSubmit(() => {
                 if (form.isValid) {

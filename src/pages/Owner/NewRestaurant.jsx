@@ -14,12 +14,13 @@ import {
 import { TimeInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { IconClock } from "@tabler/icons-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useDisclosure } from "@mantine/hooks";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "../../components/Parts/Modal";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 
 function NewRestaurant() {
   // manage the state of whether a component (such as a modal) is open or closed.
@@ -27,6 +28,34 @@ function NewRestaurant() {
   const navigate = useNavigate();
   const { sendRequest } = useFetch();
   const { successToast, errorToast } = useToast();
+  const { user } = useOutletContext();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user || !user.isOwner) {
+      navigate("/signin");
+      return;
+    }
+
+    const fetchRestaurantData = async () => {
+      try {
+        const resData = await sendRequest(
+          `${import.meta.env.VITE_API_URL}/restaurant/user`,
+          "GET"
+        );
+        if (resData) {
+          navigate("/owner/restaurant");
+          return;
+        }
+        setLoading(false);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchRestaurantData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const form = useForm({
     validate: {
@@ -146,140 +175,146 @@ function NewRestaurant() {
 
   return (
     <>
-      <Title order={2} ta="center">
-        Create Your Restaurant
-      </Title>
-      <Box maw={340} mx="auto" mt="xl">
-        <form
-          onSubmit={form.onSubmit(() => {
-            if (form.isValid) {
-              toggle();
-            }
-          })}
-        >
-          <TextInput
-            label="Name"
-            withAsterisk
-            placeholder="GA Cafe"
-            {...form.getInputProps("name")}
-          />
-          <Select
-            label="Category"
-            withAsterisk
-            placeholder="Pick one"
-            data={["Asian", "Chinese", "Japanese", "Western"]}
-            mt="md"
-            {...form.getInputProps("category")}
-          />
-          <Select
-            label="Location"
-            withAsterisk
-            placeholder="Pick one"
-            data={["North", "South", "East", "West", "Central"]}
-            mt="md"
-            {...form.getInputProps("location")}
-          />
-
-          <TextInput
-            label="Address"
-            withAsterisk
-            placeholder="79 Anson Rd, Level 20, Singapore 079906"
-            mt="md"
-            {...form.getInputProps("address")}
-          />
-          <TextInput
-            label="Phone"
-            type="number"
-            placeholder="01234567 (Exclude +65 country code)"
-            mt="md"
-            {...form.getInputProps("phone")}
-          />
-          <TextInput
-            label="Website URL"
-            placeholder="https://gacafe.com"
-            mt="md"
-            {...form.getInputProps("websiteUrl")}
-          />
-          <NumberInput
-            label="Maximum Pax"
-            placeholder="10"
-            min={1}
-            required="true"
-            mt="md"
-            {...form.getInputProps("maxPax")}
-          />
-          <TimeInput
-            label="Opening Time"
-            withAsterisk
-            mt="md"
-            ref={refOpen}
-            required="true"
-            rightSection={pickerControlOpen}
-            {...form.getInputProps("timeOpen")}
-          />
-          <TimeInput
-            label="Closing Time"
-            withAsterisk
-            mt="md"
-            ref={refClose}
-            required="true"
-            rightSection={pickerControlClose}
-            {...form.getInputProps("timeClose")}
-          />
-          <MultiSelect
-            label="Days Closed"
-            placeholder="Pick one or more"
-            data={[
-              "Sunday",
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-            ]}
-            clearable
-            searchable
-            mt="md"
-            {...form.getInputProps("daysClose")}
-          />
-          <Textarea
-            label="Description"
-            mt="md"
-            placeholder="A cozy cafe offering a wide range of coffee, tea, and pastries."
-            autosize="true"
-            minRows={3}
-            {...form.getInputProps("description")}
-          />
-          <TextInput
-            label="Image"
-            mt="md"
-            placeholder="https://gacafe.com/image.jpg"
-            {...form.getInputProps("image")}
-          />
-
-          <Group justify="center" mt="xl">
-            <Button
-              type="button"
-              component={Link}
-              to={`/owner/restaurant`} //return to Owner Dashboard
-              variant="outline"
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <Title order={2} ta="center">
+            Create Your Restaurant
+          </Title>
+          <Box maw={500} mx="auto" mt="xl">
+            <form
+              onSubmit={form.onSubmit(() => {
+                if (form.isValid) {
+                  toggle();
+                }
+              })}
             >
-              Cancel
-            </Button>
-            <Button type="submit">Create</Button>
-          </Group>
-        </form>
+              <TextInput
+                label="Name"
+                withAsterisk
+                placeholder="GA Cafe"
+                {...form.getInputProps("name")}
+              />
+              <Select
+                label="Category"
+                withAsterisk
+                placeholder="Pick one"
+                data={["Asian", "Chinese", "Japanese", "Western"]}
+                mt="md"
+                {...form.getInputProps("category")}
+              />
+              <Select
+                label="Location"
+                withAsterisk
+                placeholder="Pick one"
+                data={["North", "South", "East", "West", "Central"]}
+                mt="md"
+                {...form.getInputProps("location")}
+              />
 
-        <Modal
-          opened={opened}
-          title="Create Your Restaurant"
-          modalContent={modalContent(form)}
-          toggle={toggle}
-          close={close}
-          handleSubmit={handleSubmit}
-        />
-      </Box>
+              <TextInput
+                label="Address"
+                withAsterisk
+                placeholder="79 Anson Rd, Level 20, Singapore 079906"
+                mt="md"
+                {...form.getInputProps("address")}
+              />
+              <TextInput
+                label="Phone"
+                type="number"
+                placeholder="01234567 (Exclude +65 country code)"
+                mt="md"
+                {...form.getInputProps("phone")}
+              />
+              <TextInput
+                label="Website URL"
+                placeholder="https://gacafe.com"
+                mt="md"
+                {...form.getInputProps("websiteUrl")}
+              />
+              <NumberInput
+                label="Maximum Pax"
+                placeholder="10"
+                min={1}
+                required={true}
+                mt="md"
+                {...form.getInputProps("maxPax")}
+              />
+              <TimeInput
+                label="Opening Time"
+                withAsterisk
+                mt="md"
+                ref={refOpen}
+                required={true}
+                rightSection={pickerControlOpen}
+                {...form.getInputProps("timeOpen")}
+              />
+              <TimeInput
+                label="Closing Time"
+                withAsterisk
+                mt="md"
+                ref={refClose}
+                required={true}
+                rightSection={pickerControlClose}
+                {...form.getInputProps("timeClose")}
+              />
+              <MultiSelect
+                label="Days Closed"
+                placeholder="Pick one or more"
+                data={[
+                  "Sunday",
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                ]}
+                clearable
+                searchable
+                mt="md"
+                {...form.getInputProps("daysClose")}
+              />
+              <Textarea
+                label="Description"
+                mt="md"
+                placeholder="A cozy cafe offering a wide range of coffee, tea, and pastries."
+                autosize="true"
+                minRows={3}
+                {...form.getInputProps("description")}
+              />
+              <TextInput
+                label="Image"
+                mt="md"
+                placeholder="https://gacafe.com/image.jpg"
+                {...form.getInputProps("image")}
+              />
+
+              <Group justify="center" mt="xl">
+                <Button
+                  type="button"
+                  component={Link}
+                  to={`/owner/restaurant`} //return to Owner Dashboard
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Create</Button>
+              </Group>
+            </form>
+
+            <Modal
+              opened={opened}
+              title="Create Your Restaurant"
+              modalContent={modalContent(form)}
+              toggle={toggle}
+              close={close}
+              handleSubmit={handleSubmit}
+            />
+          </Box>
+        </>
+      )}
     </>
   );
 }

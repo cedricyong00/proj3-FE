@@ -1,10 +1,25 @@
 /* eslint-disable no-unused-vars */
-import { Text,Button} from "@mantine/core";
+import { Text, Button } from "@mantine/core";
 import classes from "../User/Account.module.css";
 import "../User/Account.module.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
+import { useEffect, useState } from "react";
+import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 
 function Account() {
+  const navigate = useNavigate();
+  const { user } = useOutletContext();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/signin");
+      return;
+    }
+    setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const dummyData = [
     {
       id: 123,
@@ -54,13 +69,31 @@ function Account() {
 
   return (
     <>
-        <div className={classes.root}>{stats}</div>
-        <div className={classes.Split}>
-            <Button className={classes.Buttons} component={Link} to="/account/edit">Edit Account Info</Button>
-            <Button className={classes.Buttons} component={Link} to="/account/bookings">See Bookings</Button>
-        </div>
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          <div className={classes.root}>{stats}</div>
+          <div className={classes.Split}>
+            <Button
+              className={classes.Buttons}
+              component={Link}
+              to="/account/edit"
+            >
+              Edit Account Info
+            </Button>
+            <Button
+              className={classes.Buttons}
+              component={Link}
+              to="/account/bookings"
+            >
+              See Bookings
+            </Button>
+          </div>
+        </>
+      )}
     </>
-  )
+  );
 }
 
 export default Account;
