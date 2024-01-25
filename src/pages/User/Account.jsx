@@ -5,6 +5,7 @@ import "../User/Account.module.css";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import { logOut } from "../../service/users";
 
 function Account() {
   const navigate = useNavigate();
@@ -88,6 +89,9 @@ function Account() {
               to="/account/bookings"
             >
               See Bookings
+            </Button>
+            <Button onClick={logOut}>
+              Logout
             </Button>
           </div>
         </>
