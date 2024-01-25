@@ -29,46 +29,36 @@ import classes from "./HeaderTabs.module.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo-new.png";
 import useToast from "../../hooks/useToast";
-import { getUser } from "../../service/users";
 import useFetch from "../../hooks/useFetch";
-import { removeToken } from "../../util/security";
 
 export const Header = ({ user, setUser }) => {
   const theme = useMantineTheme();
   const [userMenuOpened, setUserMenuOpened] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { successToast } = useToast();
+  const { successToast, errorToast } = useToast();
+  const { sendRequest } = useFetch();
 
-  // Logout function
-  async function logOut(token, userData) {
-    const userInfo = getUser();
-    const { sendRequest } = useFetch();
-    const logoutURL = `${import.meta.env.VITE_API_URL}/logout`;
-    if (token) {
-      // send request
-      const res = await sendRequest(
-        logoutURL,
-        "POST",
-        userInfo.email
-      );
-      removeToken();
-      console.log(userInfo.email)
-      window.location.reload();
-      return res;
-    }
-    return true;
-  }
-  
   const handleLogout = () => {
-    // TODO: send logout req to user api
-    setUser(null);
-    logOut();
-    navigate("/");
-    successToast({
-      title: "See you again!",
-      message: "You have successfully logged out.",
-    });
+    try {
+      const res = sendRequest(
+        `${import.meta.env.VITE_API_URL}/user/logout`,
+        "POST",
+        { email: user.email }
+      );
+      setUser(null);
+      navigate("/");
+      successToast({
+        title: "See you again!",
+        message: "You have successfully logged out.",
+      });
+    } catch (err) {
+      console.log(err);
+      errorToast({
+        title: "Error",
+        message: "Something went wrong. Please try again.",
+      });
+    }
   };
 
   return (
