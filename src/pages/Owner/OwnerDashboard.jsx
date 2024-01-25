@@ -8,6 +8,7 @@ import {
   ActionIcon,
   rem,
   useMantineTheme,
+  Title,
 } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { DatePickerInput, TimeInput } from "@mantine/dates";
@@ -161,6 +162,9 @@ function OwnerDashboard() {
 
   return (
     <>
+      <Title order={2} ta="center" mb="lg">
+        Your Gests
+      </Title>
       {loading ? (
         <LoadingSpinner />
       ) : (

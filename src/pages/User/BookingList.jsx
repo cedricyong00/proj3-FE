@@ -1,5 +1,12 @@
 /* eslint-disable react/prop-types */
-import { Table, ScrollArea, Text, Button, Anchor } from "@mantine/core";
+import {
+  Table,
+  ScrollArea,
+  Text,
+  Button,
+  Anchor,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -114,6 +121,9 @@ function BookingList() {
 
   return (
     <>
+      <Title order={2} ta="center" mb="lg">
+        Your Bookings
+      </Title>
       {loading ? (
         <LoadingSpinner />
       ) : rows.length === 0 ? (
