@@ -26,6 +26,7 @@ function SignUpPage() {
   const [name, setName] = useState("");
   const { sendRequest } = useFetch();
   const { successToast, errorToast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
 
   //user input
   const formState = {
@@ -47,6 +48,7 @@ function SignUpPage() {
 
   async function handleSubmit(evt) {
     evt.preventDefault();
+    setSubmitting(true);
     try {
       hashPassword();
       const formData = { ...formState };
@@ -55,6 +57,7 @@ function SignUpPage() {
         "POST",
         formData
       );
+      setSubmitting(false);
       navigate("/signin");
       successToast({
         title: "Signup Completed!",
@@ -63,6 +66,7 @@ function SignUpPage() {
     } catch (err) {
       console.log(err);
       errorToast(err.message ? err.message : "Error");
+      setSubmitting(false);
     }
   }
 
@@ -121,7 +125,7 @@ function SignUpPage() {
             />
           </Group>
 
-          <Button fullWidth mt="xl" onClick={handleSubmit}>
+          <Button fullWidth mt="xl" onClick={handleSubmit} loading={submitting}>
             Sign Up
           </Button>
         </Paper>

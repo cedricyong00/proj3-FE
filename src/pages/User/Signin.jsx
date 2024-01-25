@@ -10,10 +10,7 @@ import {
 } from "@mantine/core";
 import classes from "./Signin.module.css";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
-import {
-  hashDataWithSaltRounds,
-  storeToken,
-} from "../../util/security";
+import { hashDataWithSaltRounds, storeToken } from "../../util/security";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
 import { getUser } from "../../service/users";
@@ -26,8 +23,10 @@ function SignInPage() {
   const { sendRequest, getLoginDetails } = useFetch();
   const { successToast, errorToast } = useToast();
   const { setUser } = useOutletContext();
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    setSubmitting(true);
     try {
       const loginDetails = await getLoginDetails(email);
       const hashedPassword = hashDataWithSaltRounds(
@@ -46,6 +45,7 @@ function SignInPage() {
       );
       storeToken(token);
       setUser(getUser());
+      setSubmitting(false);
       navigate("/");
       successToast({
         title: "Welcome back!",
@@ -54,6 +54,7 @@ function SignInPage() {
     } catch (err) {
       console.log(err);
       errorToast(err.message ? err.message : "error");
+      setSubmitting(false);
     }
   };
 
@@ -84,11 +85,7 @@ function SignInPage() {
             mt="md"
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button
-            fullWidth
-            mt="xl"
-            onClick={handleSubmit}
-          >
+          <Button fullWidth mt="xl" onClick={handleSubmit} loading={submitting}>
             Sign in
           </Button>
         </Paper>

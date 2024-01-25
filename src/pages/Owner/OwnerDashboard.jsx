@@ -70,7 +70,7 @@ function OwnerDashboard() {
 
   useEffect(() => {
     getInitialList();
-    if (!user) {
+    if (!user || !user.isOwner) {
       navigate("/signin");
       return;
     }
@@ -161,76 +161,82 @@ function OwnerDashboard() {
 
   return (
     <>
-      <form
-        onSubmit={form.onSubmit(() => {
-          filterList();
-        })}
-      >
-        <Group align="flex-start" mb="xl">
-          <DatePickerInput
-            label="Date"
-            placeholder="Pick date"
-            miw={!isPc ? "calc(50% - 12px)" : "150px"}
-            {...form.getInputProps("date")}
-          />
-          <TimeInput
-            label="Time From"
-            ref={refFrom}
-            rightSection={pickerControlFrom}
-            miw={!isPc ? "calc(50% - 12px)" : "150px"}
-            {...form.getInputProps("timeFrom")}
-          />
-          <TimeInput
-            label="Time To"
-            ref={refTo}
-            rightSection={pickerControlTo}
-            miw={!isPc ? "calc(50% - 12px)" : "150px"}
-            {...form.getInputProps("timeTo")}
-          />
-          <Button type="submit" mt="25px">
-            Filter
-          </Button>
-          <Button
-            mt="25px"
-            variant="outline"
-            onClick={handleClearFilter}
-            disabled={!form.isDirty()}
-          >
-            Clear
-          </Button>
-        </Group>
-      </form>
       {loading ? (
         <LoadingSpinner />
-      ) : rows.length === 0 ? (
-        <Text fw={500} ta="center">
-          You have no bookings yet. <br />
-        </Text>
       ) : (
         <>
-          <ScrollArea mt="xl">
-            <Table verticalSpacing="md" miw={700}>
-              <Table.Tbody>
-                <Table.Tr>
-                  <Th>Name</Th>
-                  <Th>Date</Th>
-                  <Th>Time</Th>
-                  <Th>Pax</Th>
-                  <Th>Request</Th>
-                  <Th>Email</Th>
-                </Table.Tr>
-              </Table.Tbody>
-              <Table.Tbody>
-                {rows.length > 0 ? (
-                  rows
-                ) : (
-                  <Text fw={500} ta="center">
-                    Nothing found
-                  </Text>
-                )}
-              </Table.Tbody>
-            </Table>
-          </ScrollArea>
+          <form
+            onSubmit={form.onSubmit(() => {
+              filterList();
+            })}
+          >
+            <Group align="flex-start" mb="xl">
+              <DatePickerInput
+                label="Date"
+                placeholder="Pick date"
+                miw={!isPc ? "calc(50% - 12px)" : "150px"}
+                {...form.getInputProps("date")}
+              />
+              <TimeInput
+                label="Time From"
+                ref={refFrom}
+                rightSection={pickerControlFrom}
+                miw={!isPc ? "calc(50% - 12px)" : "150px"}
+                {...form.getInputProps("timeFrom")}
+              />
+              <TimeInput
+                label="Time To"
+                ref={refTo}
+                rightSection={pickerControlTo}
+                miw={!isPc ? "calc(50% - 12px)" : "150px"}
+                {...form.getInputProps("timeTo")}
+              />
+              <Button type="submit" mt="25px">
+                Filter
+              </Button>
+              <Button
+                mt="25px"
+                variant="outline"
+                onClick={handleClearFilter}
+                disabled={!form.isDirty()}
+              >
+                Clear
+              </Button>
+            </Group>
+          </form>
+          {loading ? (
+            <LoadingSpinner />
+          ) : rows.length === 0 ? (
+            <Text fw={500} ta="center">
+              You have no bookings yet. <br />
+            </Text>
+          ) : (
+            <>
+              <ScrollArea mt="xl">
+                <Table verticalSpacing="md" miw={700}>
+                  <Table.Tbody>
+                    <Table.Tr>
+                      <Th>Name</Th>
+                      <Th>Date</Th>
+                      <Th>Time</Th>
+                      <Th>Pax</Th>
+                      <Th>Request</Th>
+                      <Th>Email</Th>
+                    </Table.Tr>
+                  </Table.Tbody>
+                  <Table.Tbody>
+                    {rows.length > 0 ? (
+                      rows
+                    ) : (
+                      <Text fw={500} ta="center">
+                        Nothing found
+                      </Text>
+                    )}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
+            </>
+          )}
         </>
       )}
     </>

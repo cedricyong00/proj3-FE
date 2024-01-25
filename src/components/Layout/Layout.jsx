@@ -7,16 +7,6 @@ import { getUser } from "../../service/users";
 
 export const Layout = () => {
   const [user, setUser] = useState(getUser());
-  // TODO: to be removed after implementing user api
-  // dummy user
-  // const [user, setUser] = useState({
-  //   id: 1,
-  //   name: "John Doe",
-  //   email: "email@email.com",
-  //   isOwner: true,
-  // });
-  // const [user, setUser] = useState(null);
-  // JWT token's payload
 
   return (
     <Flex
