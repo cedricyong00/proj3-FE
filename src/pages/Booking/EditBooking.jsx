@@ -106,12 +106,8 @@ function EditBooking() {
         timeClose: formatTime(data.restaurant.timeClose),
       });
     }
-  }, [
-    data?.restaurant?.timeOpen,
-    data?.restaurant?.timeClose,
-    form.values.time,
-    formatTime,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
 
   useEffect(() => {
     if (data?.restaurant?.daysClose) {
