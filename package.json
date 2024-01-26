@@ -26,6 +26,7 @@
     "@tiptap/extension-link": "^2.1.13",
     "@tiptap/react": "^2.1.13",
     "@tiptap/starter-kit": "^2.1.13",
+    "bcrypt": "^5.1.1",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.10",
     "embla-carousel-react": "^7.1.0",
