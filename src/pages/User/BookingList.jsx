@@ -1,7 +1,14 @@
-import { Table, ScrollArea, Text, Button, Anchor } from "@mantine/core";
-import PropTypes from "prop-types";
+/* eslint-disable react/prop-types */
+import {
+  Table,
+  ScrollArea,
+  Text,
+  Button,
+  Anchor,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import Modal from "../../components/Parts/Modal";
@@ -22,13 +29,19 @@ function Th({ children }) {
 function BookingList() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [dataToCancel, setDataToCancel] = useState([]);
   const { sendRequest } = useFetch();
   const { successToast, errorToast } = useToast();
+  const { user } = useOutletContext();
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getList();
+    if (!user) {
+      navigate("/signin");
+      return;
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -108,6 +121,9 @@ function BookingList() {
 
   return (
     <>
+      <Title order={2} ta="center" mb="lg">
+        Your Bookings
+      </Title>
       {loading ? (
         <LoadingSpinner />
       ) : rows.length === 0 ? (
@@ -150,7 +166,3 @@ function BookingList() {
 }
 
 export default BookingList;
-
-Th.propTypes = {
-  children: PropTypes.node,
-};
