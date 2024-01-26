@@ -171,7 +171,7 @@ function EditRestaurant() {
     Object.keys(var1).forEach((key) => {
       if (
         Object.prototype.hasOwnProperty.call(var2, key) &&
-        var1[key] !== var2[key]
+        var1[key] != var2[key]
       ) {
         displayData[key] = var1[key];
       }
