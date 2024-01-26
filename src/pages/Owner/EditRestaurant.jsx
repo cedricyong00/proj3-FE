@@ -99,7 +99,6 @@ function EditRestaurant() {
         "POST",
         payload
       );
-      console.log(res);
       navigate("/owner/restaurant");
       close();
       successToast({
