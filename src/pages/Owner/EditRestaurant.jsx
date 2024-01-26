@@ -167,13 +167,29 @@ function EditRestaurant() {
   // get user edited info
   const compareData = (var1, var2) => {
     const displayData = {};
+    console.log(var1.daysClose);
+    console.log(var2.daysClose);
 
     Object.keys(var1).forEach((key) => {
-      if (
-        Object.prototype.hasOwnProperty.call(var2, key) &&
-        var1[key] !== var2[key]
-      ) {
-        displayData[key] = var1[key];
+      if (Object.prototype.hasOwnProperty.call(var2, key)) {
+        // need separate comparison for daysClose as it is stored as an array in the backend db
+        // unlike the rest
+        if (key === "daysClose") {
+          if (var1.daysClose) {
+            const isDaysCloseEqual =
+              var1.daysClose.length === var2.daysClose.length &&
+              var1.daysClose.every((day) => var2.daysClose.includes(day));
+
+            if (!isDaysCloseEqual) {
+              displayData[key] = var1[key];
+            }
+          } else {
+            return; //if the field is not edited, var1.daysClose would be undefined (from console.logs)
+          }
+        } else if (var1[key] !== var2[key]) {
+          // Check if the value is different
+          displayData[key] = var1[key];
+        }
       }
     });
 
@@ -184,7 +200,17 @@ function EditRestaurant() {
         <ul>
           {Object.entries(displayData).map(([key, value]) => (
             <li key={key}>
-              {key}: {value}
+              {key === "daysClose"
+                ? `Days Closed: ${value.join(", ")}`
+                : key === "maxPax"
+                ? `Maximum Pax: ${value}`
+                : key === "timeOpen"
+                ? `Opening Time: ${formatTime(value)}`
+                : key === "timeClose"
+                ? `Closing Time: ${formatTime(value)}`
+                : key === "websiteURL"
+                ? `Website: ${value}`
+                : `${key}: ${value}`}
             </li>
           ))}
         </ul>
