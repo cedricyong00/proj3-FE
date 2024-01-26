@@ -51,6 +51,7 @@ https://front-end-ftue.onrender.com/
 
 ## Next Steps
 * Media upload implementation for restaurant profile
+* Enhance UI for restaurant owner's view of restaurant details and validation of edited info
 * Enhancement for validation (Operation hours etc)
 
 ## References and Inspirations
