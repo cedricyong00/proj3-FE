@@ -5,13 +5,17 @@ import "../User/Account.module.css";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import useFetch from "../../hooks/useFetch";
 
 function Account() {
   const navigate = useNavigate();
+  const { sendRequest } = useFetch();
+  const [data, setData] = useState([]);
   const { user } = useOutletContext();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    getList()
     if (!user) {
       navigate("/signin");
       return;
@@ -29,25 +33,37 @@ function Account() {
     }
   }
 
-  const data = [
+  //Retrieve number of booking data
+  const getList = async () => {
+    const resData = await sendRequest(
+      `${import.meta.env.VITE_API_URL}/booking`,
+      "GET"
+    );
+    setData(resData);
+  };
+
+  //Number of booking
+  const numberOfBookings = data.length
+
+  const accountData = [
     {
       title: "Account Dashboard",
       stats: "Welcome " + user.name,
       description: "",
     },
     {
-      title: "Restaurant Info",
+      title: "Email Address",
       stats: "Account Type: " + checkAccountType(),
-      description: "Burger King, Cecil Street 13 Rd, S909090",
+      description: user.email,
     },
     {
       title: "Number Of Bookings",
       stats: "Booking",
-      // description: dummyData[0].numberOfBookings,
+      description: numberOfBookings,
     },
   ];
 
-  const stats = data.map((stat) => (
+  const stats = accountData.map((stat) => (
     <div key={stat.title} className={classes.stat}>
       <Text className={classes.count}>{stat.stats}</Text>
       <Text className={classes.title}>{stat.title}</Text>
