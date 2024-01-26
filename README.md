@@ -15,22 +15,20 @@ https://front-end-ftue.onrender.com/
 
 ## Screenshots
 
-### Create, read, update and delete operations across user account, restaurant and booking workflows in FE
-<img width="1375" alt="Screenshot 2024-01-24 at 12 10 56 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/ed96c6ca-88c2-4ba5-81c2-23a0f663feba">
-<img width="1388" alt="Screenshot 2024-01-24 at 12 12 25 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/9a0e9016-0978-4155-b5fe-d78b83d3fa45">
-<img width="1388" alt="Screenshot 2024-01-24 at 12 12 50 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/35a4530d-28f3-4ed6-9ebb-fda377072486">
-<img width="1388" alt="Screenshot 2024-01-24 at 12 13 23 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/596d5a50-ebbb-4720-9ff1-de1e25896b27">
+### Create, read, update and delete operations across user account, restaurant and booking workflows in frontend  
+<p align="center">
+<img width="733" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/54a66a9b-7ef3-4061-a14f-741568dc4f9d">  
+<img width="758" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/a177d9fe-1a99-4d54-9724-7383196c8ae2">  
+<img width="714" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/0d3902ba-8259-4497-af2c-7ad5a5f6baaa">  
+<img width="711" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/ad0ccf07-bcb3-4ef7-945b-618a332f0363">  
+<img width="830" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/04e87d3d-080f-4db7-85aa-aadfce3e3c86">  
+</p>
 
-### BE validation and feedback for unauthorised data operations
-
-_Original restaurant entry with owner info_
-<img width="863" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/958a1bbc-91e4-4d4f-8a2f-d8bd307b3075">
-
-_Request to update and delete info returns feedback of unauthorised operation as we are not logged in as the authorised owner in Postman_
-
-<img width="865" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/8a5c2cea-7dab-4219-b6c7-246f09a31c2d">
- 
-<img width="870" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/4aa028ab-eae3-4bfc-a182-08ad4a23724d">
+### Backend operations to validate identity and check user permissions  
+<p align="center">
+<img width="865" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/8a5c2cea-7dab-4219-b6c7-246f09a31c2d">  
+<img width="870" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/4aa028ab-eae3-4bfc-a182-08ad4a23724d">  
+</p>
 
 ## Technologies Used
 ### Backend API/DB
