@@ -62,8 +62,8 @@ https://front-end-ftue.onrender.com/
 
 ## Next Steps
 * Media upload implementation for restaurant profile
-* Enhance UI for restaurant owner's view of restaurant details and validation of edited info
-* Enhancement for validation (Operation hours etc)
+* Enhance form validation rules (operation hours,  etc) and scope (eg, enable customisation of opening hours based on day of week)
+* Expand user permissions to allow multiple user accounts (eg, restaurant owners and admins) to manage restaurant info (eg, bookings)
 
 ## References and Inspirations
 * [Chope](https://www.chope.co/singapore-restaurants) - UIUX of restaurant reservation app
