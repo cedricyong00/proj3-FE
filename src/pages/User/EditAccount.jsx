@@ -15,15 +15,15 @@ import { useNavigate, useOutletContext } from "react-router-dom";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 import useFetch from "../../hooks/useFetch";
 import useToast from "../../hooks/useToast";
+import { useDisclosure } from "@mantine/hooks";
 
 
 function EditAccount() {
   //Handle change in form fields
   const [email, setEmail] = useState("");
+  const [opened, { toggle, close }] = useDisclosure(false);
   const [name, setName] = useState("");
-  const [id, setID] = useState("");
   const [isOwner, setIsOwner] = useState(true);
-  const [userData, setUserData] = useState("");
   const { sendRequest } = useFetch();
   const { successToast, errorToast } = useToast();
   //Navigate
@@ -40,23 +40,23 @@ function EditAccount() {
   }, []);
 
   const userUpdatedDetails = {
+    user: user.user,
     email: email,
-    id: id,
     isOwner: isOwner,
     name: name,
-    user: userData
+    id: user.id
   };
 
   //Update button
   const handleUpdate = async () => {
     try {
       const res = await sendRequest(
-        `${import.meta.env.VITE_API_URL}/user/${user._id}/edit`,
+        `${import.meta.env.VITE_API_URL}/user/${user._id}`,
         "POST",
         userUpdatedDetails
       );
       console.log(res);
-      navigate("/acccount");
+      navigate("/account");
       close();
       successToast({
         title: "Restaurant Info Successfully Updated!",
