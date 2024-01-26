@@ -13,13 +13,19 @@ import { AccountInformationList } from "../../components/Layout/CurrentAccountIn
 import classes from "../../components/Layout/CurrentAccountInfo.module.css";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import useFetch from "../../hooks/useFetch";
+import useToast from "../../hooks/useToast";
+import { useDisclosure } from "@mantine/hooks";
+
 
 function EditAccount() {
   //Handle change in form fields
-  const [email, setEmail] = useState("cedrictest@gmail.com");
-  const [name, setName] = useState("Cedric Test");
-  const [address, setAddress] = useState("my house lor what you want");
+  const [email, setEmail] = useState("");
+  const [opened, { toggle, close }] = useDisclosure(false);
+  const [name, setName] = useState("");
   const [isOwner, setIsOwner] = useState(true);
+  const { sendRequest } = useFetch();
+  const { successToast, errorToast } = useToast();
   //Navigate
   const navigate = useNavigate();
   const { user } = useOutletContext();
@@ -30,23 +36,39 @@ function EditAccount() {
       navigate("/signin");
       return;
     }
-    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const userUpdatedDetails = {
+    user: user.user,
+    email: email,
+    isOwner: isOwner,
+    name: name,
+    id: user.id
+  };
+
   //Update button
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    const UserDetails = {
-      Email: email,
-      Name: name,
-      Adress: address,
-      isOwner: isOwner,
-    };
-    console.log(UserDetails);
-    setTimeout(() => {
+  const handleUpdate = async () => {
+    try {
+      const res = await sendRequest(
+        `${import.meta.env.VITE_API_URL}/user/${user._id}`,
+        "POST",
+        userUpdatedDetails
+      );
+      console.log(res);
       navigate("/account");
-    }, 5000);
+      close();
+      successToast({
+        title: "Restaurant Info Successfully Updated!",
+        message: "Your restaurant is now listed and available for reservations",
+      });
+    } catch (err) {
+      console.log(err);
+      close();
+      errorToast();
+    } finally {
+      close();
+    }
   };
 
   //Back button
@@ -73,24 +95,16 @@ function EditAccount() {
             <div className={classes.form}>
               <TextInput
                 label="Email"
-                value={email}
+                value={user.email}
                 classNames={{ input: classes.input, label: classes.inputLabel }}
                 onChange={(e) => setEmail(e.target.value)}
               />
               <TextInput
                 label="Name"
-                value={name}
+                value={user.name}
                 mt="md"
                 classNames={{ input: classes.input, label: classes.inputLabel }}
                 onChange={(e) => setName(e.target.value)}
-              />
-
-              <TextInput
-                label="Restaurant Info"
-                value={address}
-                mt="md"
-                classNames={{ input: classes.input, label: classes.inputLabel }}
-                onChange={(e) => setAddress(e.target.value)}
               />
 
               <br />
@@ -98,7 +112,7 @@ function EditAccount() {
               <Group justify="space-between" mt="lg">
                 <Checkbox
                   label="I am a owner of restaurant"
-                  checked={isOwner}
+                  checked={user.isOwner}
                   onChange={() => {
                     setIsOwner((prev) => !prev);
                   }}
