@@ -20,23 +20,11 @@ function Account() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const dummyData = [
-    {
-      id: 123,
-      email: "test123@gmail.com",
-      isOwner: true,
-      password: "test123",
-      name: "Cedric Yong",
-      numberOfBookings: 14,
-    },
-  ];
-
   //Returns user account type
-  function checkAccountType(id) {
-    id = 0;
-    if (dummyData[id].isOwner === true) {
+  function checkAccountType() {
+    if (user.isOwner === true) {
       return "Admin";
-    } else if (dummyData[id].isOwner === false) {
+    } else if (user.isOwner === false) {
       return "User";
     }
   }
@@ -44,7 +32,7 @@ function Account() {
   const data = [
     {
       title: "Account Dashboard",
-      stats: "Welcome " + dummyData[0].name,
+      stats: "Welcome " + user.name,
       description: "",
     },
     {
@@ -55,7 +43,7 @@ function Account() {
     {
       title: "Number Of Bookings",
       stats: "Booking",
-      description: dummyData[0].numberOfBookings,
+      // description: dummyData[0].numberOfBookings,
     },
   ];
 
