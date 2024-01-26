@@ -30,6 +30,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo-new.png";
 import useToast from "../../hooks/useToast";
 import useFetch from "../../hooks/useFetch";
+import { logOut } from "../../service/users";
 
 export const Header = ({ user, setUser }) => {
   const theme = useMantineTheme();
@@ -41,11 +42,7 @@ export const Header = ({ user, setUser }) => {
 
   const handleLogout = () => {
     try {
-      const res = sendRequest(
-        `${import.meta.env.VITE_API_URL}/user/logout`,
-        "POST",
-        { email: user.email }
-      );
+      logOut();
       setUser(null);
       navigate("/");
       successToast({
