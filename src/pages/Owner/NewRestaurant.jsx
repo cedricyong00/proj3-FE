@@ -164,9 +164,15 @@ function NewRestaurant() {
 
     return (
       <ul>
-        {Object.entries(restDetails).map(([key, val]) => (
+        {Object.entries(restDetails).map(([key, value]) => (
           <li key={key}>
-            {key}: {val}
+            {key === "DaysClosed"
+              ? `Days Closed: ${value.join(", ")}`
+              : key === "MaximumPax"
+              ? `Maximum Pax: ${value}`
+              : key === "OpeningHours"
+              ? `Opening Hours: ${value}`
+              : `${key}: ${value}`}
           </li>
         ))}
       </ul>
