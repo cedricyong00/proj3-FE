@@ -5,20 +5,35 @@ import "../User/Account.module.css";
 import { Link, useNavigate, useOutletContext } from "react-router-dom";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../../components/Parts/LoadingSpinner";
+import useFetch from "../../hooks/useFetch";
 
 function Account() {
   const navigate = useNavigate();
   const { user } = useOutletContext();
   const [loading, setLoading] = useState(true);
+  const [ accountInfo, setAccountInfo ] = useState({});
+  const { sendRequest } = useFetch();
 
   useEffect(() => {
+    //Get user Data
+    const fetchData = async () => {
+      try {
+        const userData = await sendRequest(`${import.meta.env.VITE_API_URL}/user/data`,"GET");
+        const jsonData = await userData.json();
+        console.log(jsonData);
+    // if user not logged in
     if (!user) {
       navigate("/signin");
       return;
     }
     setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  } catch (error) {
+    console.error("Error fetching user data", error);
+  }
+};
+  fetchData();
+}, [user, navigate, sendRequest]);
 
   const dummyData = [
     {
