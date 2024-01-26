@@ -18,10 +18,10 @@ https://front-end-ftue.onrender.com/
 ### Create, read, update and delete operations across user account, restaurant and booking workflows in frontend  
 <p align="center">
 <img width="733" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/54a66a9b-7ef3-4061-a14f-741568dc4f9d">  
-<img width="758" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/a177d9fe-1a99-4d54-9724-7383196c8ae2">  
-<img width="714" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/0d3902ba-8259-4497-af2c-7ad5a5f6baaa">  
-<img width="711" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/ad0ccf07-bcb3-4ef7-945b-618a332f0363">  
-<img width="830" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/04e87d3d-080f-4db7-85aa-aadfce3e3c86">  
+<img width="685" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/830a26ff-776a-4da9-a708-be4f0de000a6">   
+<img width="714" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/0d3902ba-8259-4497-af2c-7ad5a5f6baaa">   
+<img width="724" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/de462bad-a07e-443c-a90b-6a227392dcfc">  
+<img width="711" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/0243818d-443a-4b82-904d-bfff5c674c9b">
 </p>
 
 ### Backend operations to validate identity and check user permissions  
