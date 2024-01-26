@@ -14,10 +14,23 @@ https://front-end-ftue.onrender.com/
 * Frontend Application https://github.com/cedricyong00/proj3-FE
 
 ## Screenshots
-<img width="1375" alt="Screenshot 2024-01-24 at 12 10 56 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/ae27b42c-9f24-472c-920f-ab1c58855927">
-<img width="1388" alt="Screenshot 2024-01-24 at 12 12 25 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/8f2c34a0-db4b-4366-8721-e98e50c5a982">
-<img width="1388" alt="Screenshot 2024-01-24 at 12 12 50 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/fc18ca3c-6d92-4baf-b368-044300127991">
-<img width="1388" alt="Screenshot 2024-01-24 at 12 13 23 AM" src="https://github.com/cedricyong00/proj3-FE/assets/88537845/d06dd54f-8894-4f31-861f-aed632441323">
+
+### Create, read, update and delete operations across user account, restaurant and booking workflows in FE
+<img width="1375" alt="Screenshot 2024-01-24 at 12 10 56 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/ed96c6ca-88c2-4ba5-81c2-23a0f663feba">
+<img width="1388" alt="Screenshot 2024-01-24 at 12 12 25 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/9a0e9016-0978-4155-b5fe-d78b83d3fa45">
+<img width="1388" alt="Screenshot 2024-01-24 at 12 12 50 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/35a4530d-28f3-4ed6-9ebb-fda377072486">
+<img width="1388" alt="Screenshot 2024-01-24 at 12 13 23 AM" src="https://github.com/jx0906/proj3-backend/assets/88537845/596d5a50-ebbb-4720-9ff1-de1e25896b27">
+
+### BE validation and feedback for unauthorised data operations
+
+_Original restaurant entry with owner info_
+<img width="863" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/958a1bbc-91e4-4d4f-8a2f-d8bd307b3075">
+
+_Request to update and delete info returns feedback of unauthorised operation as we are not logged in as the authorised owner in Postman_
+
+<img width="865" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/8a5c2cea-7dab-4219-b6c7-246f09a31c2d">
+ 
+<img width="870" alt="image" src="https://github.com/jx0906/proj3-backend/assets/142247158/4aa028ab-eae3-4bfc-a182-08ad4a23724d">
 
 ## Technologies Used
 ### Backend API/DB
@@ -32,7 +45,7 @@ https://front-end-ftue.onrender.com/
 * [Mantine form](https://mantine.dev/form/use-form/) -Form validation
 
 ### Other packeges used
-* [dayjs](https://www.npmjs.com/package/dayjs)
+* [dayjs](https://www.npmjs.com/package/dayjs) - Date formatting
 * [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
 * [bcrypt](https://www.npmjs.com/package/bcrypt)
 * [Nodemailer](https://nodemailer.com/)
