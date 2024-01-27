@@ -16,9 +16,8 @@ import LoadingSpinner from "../../components/Parts/LoadingSpinner";
 
 function EditAccount() {
   //Handle change in form fields
-  const [email, setEmail] = useState("cedrictest@gmail.com");
-  const [name, setName] = useState("Cedric Test");
-  const [address, setAddress] = useState("my house lor what you want");
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [isOwner, setIsOwner] = useState(true);
   //Navigate
   const navigate = useNavigate();
@@ -26,6 +25,9 @@ function EditAccount() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setIsOwner(user.isOwner);
+    setEmail(user.email);
+    setName(user.name);  
     if (!user) {
       navigate("/signin");
       return;
@@ -40,7 +42,7 @@ function EditAccount() {
     const UserDetails = {
       Email: email,
       Name: name,
-      Adress: address,
+      Adress: user.address,
       isOwner: isOwner,
     };
     console.log(UserDetails);
@@ -83,14 +85,6 @@ function EditAccount() {
                 mt="md"
                 classNames={{ input: classes.input, label: classes.inputLabel }}
                 onChange={(e) => setName(e.target.value)}
-              />
-
-              <TextInput
-                label="Restaurant Info"
-                value={address}
-                mt="md"
-                classNames={{ input: classes.input, label: classes.inputLabel }}
-                onChange={(e) => setAddress(e.target.value)}
               />
 
               <br />
