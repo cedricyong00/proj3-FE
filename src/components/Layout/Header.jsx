@@ -42,6 +42,11 @@ export const Header = ({ user, setUser }) => {
 
   const handleLogout = () => {
     try {
+      const res = sendRequest(
+        `${import.meta.env.VITE_API_URL}/user/logout`,
+        "POST",
+        { email: user.email }
+      );
       logOut();
       setUser(null);
       navigate("/");
