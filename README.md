@@ -58,12 +58,17 @@ https://front-end-ftue.onrender.com/
 * [Frontend page structure](https://docs.google.com/spreadsheets/d/1TnCePLg6PgL4GXJ8U22dSM6ApNFd635rB7x1h6AjDYc/edit#gid=0)
 
 ## Key Challenges/takeaways
-*
+* First-time working as a team
+* It is faster to work as a team than individually
+* Prioritization of work, delay in important processes may delay the work for others
+* Adaptation to other's style
 
 ## Next Steps
 * Media upload implementation for restaurant profile
 * Enhance form validation rules (operation hours,  etc) and scope (eg, enable customisation of opening hours based on day of week)
 * Expand user permissions to allow multiple user accounts (eg, restaurant owners and admins) to manage restaurant info (eg, bookings)
+* Allow user to delete their accounts from our database
+* Adding in of GPS tracker API
 
 ## References and Inspirations
 * [Chope](https://www.chope.co/singapore-restaurants) - UIUX of restaurant reservation app
