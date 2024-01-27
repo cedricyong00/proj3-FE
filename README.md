@@ -58,7 +58,10 @@ https://front-end-ftue.onrender.com/
 * [Frontend page structure](https://docs.google.com/spreadsheets/d/1TnCePLg6PgL4GXJ8U22dSM6ApNFd635rB7x1h6AjDYc/edit#gid=0)
 
 ## Key Challenges/takeaways
-*
+* First-time working as a team
+* It is faster to work as a team than individually
+* Prioritization of work, delay in important processes may delay the work for others
+* Adaptation to other's style
 
 ## Next Steps
 * Media upload implementation for restaurant profile
