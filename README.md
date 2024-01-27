@@ -67,6 +67,8 @@ https://front-end-ftue.onrender.com/
 * Media upload implementation for restaurant profile
 * Enhance form validation rules (operation hours,  etc) and scope (eg, enable customisation of opening hours based on day of week)
 * Expand user permissions to allow multiple user accounts (eg, restaurant owners and admins) to manage restaurant info (eg, bookings)
+* Allow user to delete their accounts from our database
+* Adding in of GPS tracker API
 
 ## References and Inspirations
 * [Chope](https://www.chope.co/singapore-restaurants) - UIUX of restaurant reservation app
